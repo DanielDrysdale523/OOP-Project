@@ -1,13 +1,10 @@
 /**
  * Write a description of class Typist here.
  *
- * Starter code generously abandoned by Ty Posaurus, your predecessor,
- * who typed with two fingers and considered that "good enough".
- * He left a sticky note: "the slide-back thing is optional probably".
- * It is not optional. Good luck.
+ * Provides an object to serve as a racer in the racing game.
  *
- * @author (your name)
- * @version (a version number or a date)
+ * @author DanielDrysdale
+ * @version 0.1
  */
 public class Typist
 {
@@ -17,6 +14,14 @@ public class Typist
     // Another tracks whether the typist is currently burnt out.
     // A third tracks HOW MANY turns of burnout remain (not just whether they are burnt out).
     // The remaining three should be fairly obvious.
+
+    int currentPlace = 0;
+    int burnOutTurnsLeft = 0;
+    Boolean isBurnedOut = false;
+
+    char symbol;
+    String name;
+    double accuracy;
 
 
 
@@ -32,6 +37,15 @@ public class Typist
      */
     public Typist(char typistSymbol, String typistName, double typistAccuracy)
     {
+        symbol = typistSymbol;
+        name = typistName;
+        if(typistAccuracy <=1.0 && typistAccuracy >= 0.0){
+            accuracy = typistAccuracy;
+        }
+        else{
+            accuracy= 0.0;
+        }
+        
 
     }
 
@@ -46,6 +60,8 @@ public class Typist
      */
     public void burnOut(int turns)
     {
+        isBurnedOut = true;
+        burnOutTurnsLeft = turns;
 
     }
 
@@ -56,6 +72,13 @@ public class Typist
      */
     public void recoverFromBurnout()
     {
+        if(isBurnedOut){
+            burnOutTurnsLeft = burnOutTurnsLeft - 1;
+            if(burnOutTurnsLeft <= 0){
+                isBurnedOut = false;
+            }
+
+        }
 
     }
 
@@ -66,7 +89,7 @@ public class Typist
      */
     public double getAccuracy()
     {
-        return 0.0; // placeholder - replace with correct implementation
+        return accuracy; 
     }
 
     /**
@@ -78,7 +101,7 @@ public class Typist
      */
     public int getProgress()
     {
-        return 0; // placeholder - replace with correct implementation
+        return currentPlace; 
     }
 
     /**
@@ -88,7 +111,7 @@ public class Typist
      */
     public String getName()
     {
-        return ""; // placeholder - replace with correct implementation
+        return name; 
     }
 
     /**
@@ -98,7 +121,7 @@ public class Typist
      */
     public char getSymbol()
     {
-        return ' '; // placeholder - replace with correct implementation
+        return symbol; 
     }
 
     /**
@@ -109,7 +132,7 @@ public class Typist
      */
     public int getBurnoutTurnsRemaining()
     {
-        return 0; // placeholder - replace with correct implementation
+        return burnOutTurnsLeft; 
     }
 
     /**
@@ -117,7 +140,12 @@ public class Typist
      * Progress returns to zero, burnout is cleared entirely.
      */
     public void resetToStart()
+
     {
+        isBurnedOut = false;
+        burnOutTurnsLeft = 0;
+        currentPlace = 0;
+
 
     }
 
@@ -128,7 +156,7 @@ public class Typist
      */
     public boolean isBurntOut()
     {
-        return false; // placeholder - replace with correct implementation
+        return isBurnedOut; 
     }
 
     /**
@@ -137,6 +165,7 @@ public class Typist
      */
     public void typeCharacter()
     {
+        currentPlace = currentPlace + 1;
 
     }
 
@@ -148,6 +177,12 @@ public class Typist
      */
     public void slideBack(int amount)
     {
+        if(amount <= currentPlace){
+            currentPlace = currentPlace - amount;
+        }
+        else if(amount > currentPlace){
+            currentPlace = 0;
+        }
 
     }
 
@@ -159,6 +194,13 @@ public class Typist
      */
     public void setAccuracy(double newAccuracy)
     {
+        if(newAccuracy <=1.0 && newAccuracy >= 0.0){
+            accuracy = newAccuracy;
+        }
+        else{
+            accuracy= 0.0;
+        }
+        
 
     }
 
@@ -169,6 +211,7 @@ public class Typist
      */
     public void setSymbol(char newSymbol)
     {
+        symbol = newSymbol;
 
     }
 

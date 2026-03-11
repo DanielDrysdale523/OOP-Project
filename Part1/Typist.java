@@ -4,7 +4,7 @@
  * Provides an object to serve as a racer in the racing game.
  *
  * @author DanielDrysdale
- * @version 0.1
+ * @version 1.0
  */
 public class Typist
 {

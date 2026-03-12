@@ -42,8 +42,11 @@ public class Typist
         if(typistAccuracy <=1.0 && typistAccuracy >= 0.0){
             accuracy = typistAccuracy;
         }
-        else{
+        else if (typistAccuracy < 0.0){
             accuracy= 0.0;
+        }
+        else{
+            accuracy = 1.0;
         }
         
 
@@ -197,8 +200,11 @@ public class Typist
         if(newAccuracy <=1.0 && newAccuracy >= 0.0){
             accuracy = newAccuracy;
         }
-        else{
+        else if (newAccuracy < 0.0){
             accuracy= 0.0;
+        }
+        else{
+            accuracy = 1.0;
         }
         
 

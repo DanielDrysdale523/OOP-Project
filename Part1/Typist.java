@@ -15,13 +15,13 @@ public class Typist
     // A third tracks HOW MANY turns of burnout remain (not just whether they are burnt out).
     // The remaining three should be fairly obvious.
 
-    int currentPlace = 0;
-    int burnOutTurnsLeft = 0;
-    Boolean isBurnedOut = false;
+    private int currentPlace = 0;
+    private int burnOutTurnsLeft = 0;
+    private Boolean isBurnedOut = false;
 
-    char symbol;
-    String name;
-    double accuracy;
+    private char symbol;
+    private String name;
+    private double accuracy;
 
 
 

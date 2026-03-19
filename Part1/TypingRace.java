@@ -1,5 +1,4 @@
 import java.util.concurrent.TimeUnit;
-import java.lang.Math;
 
 /**
  * A typing race simulation. Three typists race to complete a passage of text,
@@ -79,19 +78,19 @@ public class TypingRace
         boolean finished = false;
 
         // Reset all typists to the start of the passage
-        // (Ty was in a hurry here)
         seat1Typist.resetToStart();
         seat2Typist.resetToStart();
+        seat3Typist.resetToStart();
 
         while (!finished)
         {
             // Advance each typist by one turn
-            advanceTypist(seat1Typist);
-            advanceTypist(seat2Typist);
-            advanceTypist(seat3Typist);
+            Boolean didpass1 = advanceTypist(seat1Typist);
+            Boolean didpass2 = advanceTypist(seat2Typist);
+            Boolean didpass3 = advanceTypist(seat3Typist);
 
             // Print the current state of the race
-            printRace();
+            printRace(didpass1, didpass2, didpass3);
 
             // Check if any typist has finished the passage
             if ( raceFinishedBy(seat1Typist) || raceFinishedBy(seat2Typist) || raceFinishedBy(seat3Typist) )
@@ -121,13 +120,14 @@ public class TypingRace
      *
      * @param theTypist the typist to advance
      */
-    private void advanceTypist(Typist theTypist)
+    private Boolean advanceTypist(Typist theTypist)
     {
+        Boolean returnValue = false;
         if (theTypist.isBurntOut())
         {
             // Recovering from burnout — skip this turn
             theTypist.recoverFromBurnout();
-            return;
+            return false;
         }
 
         // Attempt to type a character
@@ -140,6 +140,7 @@ public class TypingRace
         if (Math.random() < theTypist.getAccuracy() * MISTYPE_BASE_CHANCE)
         {
             theTypist.slideBack(SLIDE_BACK_AMOUNT);
+            returnValue = true;
         }
 
         // Burnout check — pushing too hard increases burnout risk
@@ -148,6 +149,7 @@ public class TypingRace
         {
             theTypist.burnOut(BURNOUT_DURATION);
         }
+        return returnValue;
     }
 
     /**
@@ -174,7 +176,7 @@ public class TypingRace
      * Shows each typist's position along the passage, burnout state,
      * and a WPM estimate based on current progress.
      */
-    private void printRace()
+    private void printRace(Boolean did1Fall, Boolean did2Fall, Boolean did3Fall)
     {
         System.out.print('\u000C'); // Clear terminal
 
@@ -182,18 +184,18 @@ public class TypingRace
         multiplePrint('=', passageLength + 3);
         System.out.println();
 
-        printSeat(seat1Typist);
+        printSeat(seat1Typist, did1Fall);
         System.out.println();
 
-        printSeat(seat2Typist);
+        printSeat(seat2Typist, did2Fall);
         System.out.println();
 
-        printSeat(seat3Typist);
+        printSeat(seat3Typist, did3Fall);
         System.out.println();
 
         multiplePrint('=', passageLength + 3);
         System.out.println();
-        System.out.println("  [zz] = burnt out    [<] = just mistyped");
+        System.out.println("  [~] = burnt out    [<] = just mistyped");
     }
 
     /**
@@ -208,7 +210,7 @@ public class TypingRace
      *
      * @param theTypist the typist whose lane to print
      */
-    private void printSeat(Typist theTypist)
+    private void printSeat(Typist theTypist, Boolean didStall)
     {
         int spacesBefore = theTypist.getProgress();
         int spacesAfter  = passageLength - theTypist.getProgress();
@@ -224,6 +226,12 @@ public class TypingRace
             System.out.print('~');
             spacesAfter--; // symbol + ~ together take two characters
         }
+        if(didStall){
+            System.out.print("[<]");
+            spacesAfter--;
+            spacesAfter--;
+            spacesAfter--;// symbol + [<] together take 4 characters
+        }
 
         multiplePrint(' ', spacesAfter);
         System.out.print('|');
@@ -235,12 +243,19 @@ public class TypingRace
             System.out.print(theTypist.getName()
                 + " (Accuracy: " + theTypist.getAccuracy() + ")"
                 + " BURNT OUT (" + theTypist.getBurnoutTurnsRemaining() + " turns)");
+            if(didStall){
+                System.out.print(" <- JUST MISYPED");
+            }
         }
         else
         {
             System.out.print(theTypist.getName()
                 + " (Accuracy: " + theTypist.getAccuracy() + ")");
+            if(didStall){
+                System.out.print(" <- JUST MISYPED");
+            }
         }
+        
     }
 
     /**

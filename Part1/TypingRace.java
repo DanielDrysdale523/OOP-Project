@@ -1,5 +1,6 @@
 import java.util.concurrent.TimeUnit;
-;
+import java.lang.Math;
+
 /**
  * A typing race simulation. Three typists race to complete a passage of text,
  * advancing character by character — or sliding backwards when they mistype.

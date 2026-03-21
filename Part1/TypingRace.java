@@ -9,8 +9,8 @@ import java.lang.Math;
  * two-finger technique". He assured us the code was "basically done".
  * We have found evidence to the contrary.
  *
- * @author TyPosaurus
- * @version 0.7 (the other 0.3 is left as an exercise for the reader)
+ * @author Daniel Drysdale
+ * @version 0.8 (the other 0.3 is left as an exercise for the reader)
  */
 public class TypingRace
 {
@@ -104,8 +104,24 @@ public class TypingRace
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (Exception e) {}
         }
+        //Print the races winner
+        Random random = new Random();
+        if(raceFinishedBy(seat1Typist)){
+            System.out.println("And the Winner is ..." + seat1Typist.getName());
+            Double x = seat1Typist.getAccuracy() * 100 + random.nextInt(5);
+            seat1Typist.setAccuracy(x/100.0);
+        }else if(raceFinishedBy(seat2Typist)){
+            System.out.println("And the Winner is ..." + seat2Typist.getName());
+            Double x = seat2Typist.getAccuracy() * 100 + random.nextInt(5);
+            seat2Typist.setAccuracy(x/100.0);
+    
+        }else if(raceFinishedBy(seat3Typist)){
+            System.out.println("And the Winner is ..." + seat3Typist.getName());
+            Double x = seat3Typist.getAccuracy() * 100 + random.nextInt(5);
+            seat3Typist.setAccuracy(x/100.0);
 
-        // TODO (Task 2a): Print the winner's name here
+        }
+
     }
 
     /**
@@ -149,6 +165,9 @@ public class TypingRace
         if (Math.random() < 0.05 * theTypist.getAccuracy() * theTypist.getAccuracy())
         {
             theTypist.burnOut(BURNOUT_DURATION);
+            //If you burn out, you loose 0.01 accuracy
+            Double x = theTypist.getAccuracy() * 100 - 1;
+            theTypist.setAccuracy(x/100.0);
         }
         return returnValue;
     }

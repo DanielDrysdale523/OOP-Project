@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * We have found evidence to the contrary.
  *
  * @author Daniel Drysdale
- * @version 0.8 (the other 0.3 is left as an exercise for the reader)
+ * @version 0.9 
  */
 public class TypingRace
 {
@@ -145,29 +145,41 @@ public class TypingRace
             theTypist.recoverFromBurnout();
             return false;
         }
-
-        // Attempt to type a character
-        if (Math.random() < theTypist.getAccuracy())
-        {
-            theTypist.typeCharacter();
-        }
-
-        // Mistype check — the probability should reflect the typist's accuracy
-        if (Math.random() < theTypist.getAccuracy() * MISTYPE_BASE_CHANCE)
-        {
-            theTypist.slideBack(SLIDE_BACK_AMOUNT);
-            returnValue = true;
-        }
-
         // Burnout check — pushing too hard increases burnout risk
         // (probability scales with accuracy squared, capped at ~0.05)
+        //You first see if you burnout.
         if (Math.random() < 0.05 * theTypist.getAccuracy() * theTypist.getAccuracy())
         {
+            Random random = new Random();
             theTypist.burnOut(BURNOUT_DURATION);
             //If you burn out, you loose 0.01 accuracy
-            Double x = theTypist.getAccuracy() * 100 - 1;
+            Double x = theTypist.getAccuracy() * 100 - random.nextInt(3);;
             theTypist.setAccuracy(x/100.0);
+        }else{
+            //So, if you dont burn out, you can try typing
+            // Attempt to type a character repeatedly
+            //Lowe accuracy can type more at once
+            for(int x = 0; x< 11- Math.floor(theTypist.getAccuracy() * 10); x++){
+                if (Math.random() < theTypist.getAccuracy())
+                {
+                    theTypist.typeCharacter();
+                }else if(Math.random() < theTypist.getAccuracy() * MISTYPE_BASE_CHANCE){
+                    //failed to type a character, so will slideback
+                    theTypist.slideBack(SLIDE_BACK_AMOUNT);
+                    returnValue = true;
+                    x = 111;
+                }else{
+                    x = 111;
+                }
+            }
+            
         }
+
+        
+
+        
+
+        
         return returnValue;
     }
 

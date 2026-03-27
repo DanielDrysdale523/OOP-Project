@@ -9,7 +9,7 @@ import java.util.concurrent.TimeUnit;
  * We have found evidence to the contrary.
  *
  * @author Daniel Drysdale
- * @version 0.9 
+ * @version 0.8 (the other 0.3 is left as an exercise for the reader)
  */
 public class TypingRace
 {
@@ -103,7 +103,6 @@ public class TypingRace
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (Exception e) {}
         }
-        //Print the races winner
         Random random = new Random();
         if(raceFinishedBy(seat1Typist)){
             System.out.println("And the Winner is ..." + seat1Typist.getName());
@@ -120,7 +119,6 @@ public class TypingRace
             seat3Typist.setAccuracy(x/100.0);
 
         }
-
     }
 
     /**
@@ -157,9 +155,7 @@ public class TypingRace
             theTypist.setAccuracy(x/100.0);
         }else{
             //So, if you dont burn out, you can try typing
-            // Attempt to type a character repeatedly
-            //Lowe accuracy can type more at once
-            for(int x = 0; x< 11- Math.floor(theTypist.getAccuracy() * 10); x++){
+            // Attempt to type a charecter, then check for mistype.
                 if (Math.random() < theTypist.getAccuracy())
                 {
                     theTypist.typeCharacter();
@@ -167,17 +163,12 @@ public class TypingRace
                     //failed to type a character, so will slideback
                     theTypist.slideBack(SLIDE_BACK_AMOUNT);
                     returnValue = true;
-                    x = 111;
-                }else{
-                    x = 111;
                 }
-            }
+            
             
         }
 
-        
-
-        
+         
 
         
         return returnValue;
@@ -191,8 +182,8 @@ public class TypingRace
      */
     private boolean raceFinishedBy(Typist theTypist)
     {
-        // Ty was confident this condition was correct
-        if (theTypist.getProgress() == passageLength)
+        // In case of overflow, use >=
+        if (theTypist.getProgress() >= passageLength)
         {
             return true;
         }
@@ -245,6 +236,17 @@ public class TypingRace
     {
         int spacesBefore = theTypist.getProgress();
         int spacesAfter  = passageLength - theTypist.getProgress();
+        if(spacesBefore >= passageLength){
+            System.out.print('|');
+            multiplePrint(' ', passageLength);
+            System.out.print(theTypist.getSymbol());
+            System.out.print('|');
+            System.out.print(' ');
+            System.out.print(theTypist.getName()
+                + " (Accuracy: " + theTypist.getAccuracy() + ")");
+            return;
+            
+        }
 
         System.out.print('|');
         multiplePrint(' ', spacesBefore);

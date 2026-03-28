@@ -1,5 +1,6 @@
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+
 /**
  * A typing race simulation. Three typists race to complete a passage of text,
  * advancing character by character — or sliding backwards when they mistype.
@@ -9,7 +10,7 @@ import java.util.concurrent.TimeUnit;
  * We have found evidence to the contrary.
  *
  * @author Daniel Drysdale
- * @version 0.8 (the other 0.3 is left as an exercise for the reader)
+ * @version 1.0 
  */
 public class TypingRace
 {
@@ -21,7 +22,7 @@ public class TypingRace
     // Accuracy thresholds for mistype and burnout events
     // (Ty tuned these values "by feel". They may need adjustment.)
     private static final double MISTYPE_BASE_CHANCE = 0.3;
-    private static final int    SLIDE_BACK_AMOUNT   = 2;
+    private static final int    SLIDE_BACK_AMOUNT   = 3;
     private static final int    BURNOUT_DURATION     = 3;
 
     /**
@@ -225,7 +226,7 @@ public class TypingRace
      *
      * Examples:
      *   |          ⌨           | TURBOFINGERS (Accuracy: 0.85)
-     *   |    [zz]              | HUNT_N_PECK  (Accuracy: 0.40) BURNT OUT (2 turns)
+     *   |    [zz]               | HUNT_N_PECK  (Accuracy: 0.40) BURNT OUT (2 turns)
      *
      * Note: Ty forgot to show when a typist has just mistyped. That would
      * be a nice improvement — perhaps a [<] marker after their symbol.
@@ -306,4 +307,21 @@ public class TypingRace
             i = i + 1;
         }
     }
+
+    public TypingRace() {
+    }
+    
+    public void main(String a1[]) {
+        Typist a = new Typist('7', "75%", 0.75);
+        Typist b = new Typist('5', "50%", 0.5);
+        Typist c = new Typist('2', "25%", 0.25);
+        addTypist(a, 1);
+        addTypist(b, 2);
+        addTypist(c, 3);
+        passageLength = 10;
+        startRace();
+     }
+     
+        
+
 }

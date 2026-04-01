@@ -3,7 +3,18 @@ import java.awt.event.ActionListener;
 import  java.awt.event.ActionEvent;
 import javax.swing.*;
 import javax.swing.event.*;
-
+import java.awt.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import  javax.swing.JSlider;
+import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 class setupGUI{
     //to setup we need to select
     //Race length
@@ -19,16 +30,22 @@ class setupGUI{
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 
-        //Selecting typist number
-        Panel TypistNumSelection = new Panel();
+       //Selecting typist number
+        JPanel TypistNumSelection = new JPanel();
+        TypistNumSelection.setLayout(new BoxLayout(TypistNumSelection, BoxLayout.Y_AXIS));
 
-        JSlider slide = new JSlider(JSlider.HORIZONTAL, 2, 6, 5);
+        Border blackline = BorderFactory.createLineBorder(Color.gray, 1);
+
+        TypistNumSelection.setBorder(blackline);
+
+
+        JSlider slide = new JSlider(JSlider.HORIZONTAL, 2, 6, 6);
 
         slide.setMajorTickSpacing(1); // Large ticks every unit
         slide.setPaintTicks(true);     // Display tick marks
         slide.setPaintLabels(true);    // Display numeric labels
-
-        //Make an array of frames - each with thier own input
+        
+         //Make an array of frames - each with thier own input
         Panel[] TypistArray = new Panel[6];
         TypistArray[0] = new Panel();
         TypistArray[1] = new Panel();
@@ -36,12 +53,85 @@ class setupGUI{
         TypistArray[3] = new Panel();
         TypistArray[4] = new Panel();
         TypistArray[5] = new Panel();
-        TypistArray[0].add(new Button("CANCEL"));
-        TypistArray[1].add(new Button("CANCEL"));
-        TypistArray[2].add(new Button("CANCEL"));
-        TypistArray[3].add(new Button("CANCEL"));
-        TypistArray[4].add(new Button("CANCEL"));
-        TypistArray[5].add(new Button("CANCEL"));
+        JLabel[] playerLabelArray = new JLabel[6];
+        JTextField[] playerNamesArray = new JTextField[6];
+
+        playerNamesArray[0] = new JTextField("", 20);
+        playerNamesArray[1] = new JTextField("", 20);
+        playerNamesArray[2] = new JTextField("", 20);
+        playerNamesArray[3] = new JTextField("", 20);
+        playerNamesArray[4] = new JTextField("", 20);
+        playerNamesArray[5] = new JTextField("", 20);
+
+        playerLabelArray[0] = new JLabel("Player 1 - Name:");
+        playerLabelArray[1] = new JLabel("Player 2 - Name:");
+        playerLabelArray[2] = new JLabel("Player 3 - Name:");
+        playerLabelArray[3] = new JLabel("Player 4 - Name:");
+        playerLabelArray[4] = new JLabel("Player 5 - Name:");
+        playerLabelArray[5] = new JLabel("Player 6 - Name:");
+
+        //Need to Add:
+        //Typing Style
+        JLabel[] typingStyleLabelArray = new JLabel[6];
+
+        @SuppressWarnings("unchecked")
+        JComboBox<String>[] typingStyleSelectionArray = new JComboBox[6];
+
+        
+        final String[] typingStyles = {"Hunt and Peck", "Touch Typing", "Phone Thumbs", "Voice to Text"};
+        typingStyleLabelArray[0] = new JLabel("Typing Style:");
+        typingStyleLabelArray[1] = new JLabel("Typing Style:");
+        typingStyleLabelArray[2] = new JLabel("Typing Style:");
+        typingStyleLabelArray[3] = new JLabel("Typing Style:");
+        typingStyleLabelArray[4] = new JLabel("Typing Style:");
+        typingStyleLabelArray[5] = new JLabel("Typing Style:");
+        for (int i = 0; i < 6; i++) {
+            typingStyleSelectionArray[i] = new JComboBox<>(typingStyles);
+
+            
+        }
+
+        //Keyboard Type
+
+        JLabel[] KeyboardLabelArray = new JLabel[6];
+        final String[] keyboardTypes = {"Mechanical", "Membrane", "Touchscreen", "Sternography"};
+
+        @SuppressWarnings("unchecked")
+        JComboBox<String>[] KeyboardSelectionArray = new JComboBox[6];
+
+        KeyboardLabelArray[0] = new JLabel("Keyboard Type:");
+        KeyboardLabelArray[1] = new JLabel("Keyboard Type:");   
+        KeyboardLabelArray[2] = new JLabel("Keyboard Type:");
+        KeyboardLabelArray[3] = new JLabel("Keyboard Type:");
+        KeyboardLabelArray[4] = new JLabel("Keyboard Type:");
+        KeyboardLabelArray[5] = new JLabel("Keyboard Type:");
+        
+        for (int i = 0; i < 6; i++) {
+            KeyboardSelectionArray[i] = new JComboBox<>(keyboardTypes);    
+        }
+
+        //Symbol + Color
+        
+
+
+        //Accessories
+
+
+        //Final attributes
+
+        //Accuracy, Slide-Back amount, Burnout Risk, Burnout Recovery Time, Slide-Back Risk.
+
+        //Adding the Options to the list.
+        
+        for (int i = 0; i < 6; i++) {
+            TypistArray[i].add(playerLabelArray[i]);
+            TypistArray[i].add(playerNamesArray[i]);
+            TypistArray[i].add(typingStyleLabelArray[i]);
+            TypistArray[i].add(typingStyleSelectionArray[i]);
+            TypistArray[i].add(KeyboardLabelArray[i]);
+            TypistArray[i].add(KeyboardSelectionArray[i]);
+        }
+       
 
         TypistNumSelection.add(slide);
 
@@ -56,16 +146,13 @@ class setupGUI{
             public void stateChanged(ChangeEvent e) {
                 if(lastNum != slide.getValue()){
 
-                    System.out.println("----------");
                     //Here we update a set of inputs - 
-                    //so you have the same amount as the thing on the listener
+                    //so java C:\Users\danie\Desktop\button.javayou have the same amount as the thing on the listener
                     for(int i = 5; i >= slide.getValue(); i--){
-                        System.out.println("Removing " + i);
                         TypistNumSelection.remove(TypistArray[i]);
                     }
                     for(int i = lastNum; i < slide.getValue(); i++){
                         TypistNumSelection.add(TypistArray[i]);
-                        System.out.println("Adding " + i);
                     }
 
                     updateLast(slide.getValue());
@@ -77,11 +164,19 @@ class setupGUI{
         });
 
         
+
+        //
         
 
+        mainFrame.add(TypistNumSelection);
+
+        mainFrame.setSize(1000, 1000);
+
+        mainFrame.setVisible(true);
     }
-    public void updateLast(int i){
-        lastNum = i;
+    public void updateLast(int x){
+
+            lastNum = x;
     }
 
 }

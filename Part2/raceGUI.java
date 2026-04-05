@@ -1,10 +1,5 @@
 import java.awt.*;
-import javax.swing.*;
-import  javax.swing.border.Border;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
 
-import java.awt.*;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComboBox;
@@ -243,6 +238,9 @@ class endRaceGui{
 class raceGUI{
 
 }
+
+//Sourced from: 
+//https://www.tutorialspoint.com/article/how-can-we-limit-the-number-of-characters-inside-a-jtextfield-in-java
 
 class JTextFieldLimit extends PlainDocument {
    private int limit;

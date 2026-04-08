@@ -1,9 +1,9 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -55,18 +55,26 @@ class setupGUI{
     "From the moment I understood the weakness of my flesh, it disgusted me. I craved the strength and certainty of steel. I aspired to the purity of the Blessed Machine. Your kind cling to your flesh, as if it will not decay and fail you. One day the crude biomass that you call a temple will wither, and you will beg my kind to save you. But I am already saved, for the Machine is immortal"};
 
     setupGUI(){
-        //Making the frame where everything goes
-        JFrame mainFrame = new JFrame();
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        JFrame f = new JFrame();
+        f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        f.setLayout(new FlowLayout());
+
+
 
 
        //Selecting typist number
         JPanel TypistNumSelection = new JPanel();
+        TypistNumSelection.setPreferredSize(new Dimension(1200, 300));
         TypistNumSelection.setLayout(new BoxLayout(TypistNumSelection, BoxLayout.Y_AXIS));
+        //Have a panel to store the typist info. 
+        JPanel typistInfo = new JPanel();
+       // typistInfo.setLayout(new BoxLayout(typistInfo, BoxLayout.X_AXIS));
 
         Border blackline = BorderFactory.createLineBorder(Color.gray, 1);
 
         TypistNumSelection.setBorder(blackline);
+
 
         //Adding Title
         JLabel title = new JLabel("Typist Selection");
@@ -89,6 +97,14 @@ class setupGUI{
         TypistArray[3] = new Panel();
         TypistArray[4] = new Panel();
         TypistArray[5] = new Panel();
+
+
+        TypistArray[0].setPreferredSize(new Dimension(1200, 50));
+        TypistArray[1].setPreferredSize(new Dimension(1200, 50));
+        TypistArray[2].setPreferredSize(new Dimension(1200, 50));
+        TypistArray[3].setPreferredSize(new Dimension(1200, 50));
+        TypistArray[4].setPreferredSize(new Dimension(1200, 50));
+        TypistArray[5].setPreferredSize(new Dimension(1200, 50));
         JLabel[] playerLabelArray = new JLabel[6];
         JTextField[] playerNamesArray = new JTextField[6];
 
@@ -146,7 +162,7 @@ class setupGUI{
             KeyboardSelectionArray[i] = new JComboBox<>(keyboardTypes);    
         }
 
-        //Symbol 
+        //Symbol  JTextFieldLimit(1): To allow a single char to be inputted
         JLabel[] symbolLabelArray = new JLabel[6];
         JTextField[] symbolFieldArray = new JTextField[6];
 
@@ -155,7 +171,7 @@ class setupGUI{
             symbolFieldArray[i] = new JTextField(1);
             symbolFieldArray[i].setDocument(new JTextFieldLimit(1));
         }
-        
+
         //Color
         JLabel[] colorLabelArray = new JLabel[6];
         colorLabelArray[0] = new JLabel("Color:");
@@ -194,14 +210,17 @@ class setupGUI{
             AccessoriesSelectionArray[i] = new JComboBox<>(accessoriesOptions);
         }
 
-        //Final attributes
-        //Accuracy, Slide-Back amount, Burnout Risk, Burnout Recovery Time, Slide-Back Risk.
+       
 
+
+        //Final attributes
+
+        //Accuracy, Slide-Back amount, Burnout Risk, Burnout Recovery Time, Slide-Back Risk.
 
         //Adding the Options to the list.
         
         for (int i = 0; i < 6; i++) {
-             TypistArray[i].add(playerLabelArray[i]);
+            TypistArray[i].add(playerLabelArray[i]);
             TypistArray[i].add(playerNamesArray[i]);
             TypistArray[i].add(typingStyleLabelArray[i]);
             TypistArray[i].add(typingStyleSelectionArray[i]);
@@ -221,24 +240,160 @@ class setupGUI{
         for(int i = lastNum; i < slide.getValue(); i++){
             TypistNumSelection.add(TypistArray[i]);
         }
+
         
         lastNum = slide.getValue();
+        //Now we need to make the summary section - this is where we will update the info as the user inputs it.
+
+        JPanel[] TypistSummaryArray = new JPanel[6];
+        TypistSummaryArray[0] = new JPanel();
+        TypistSummaryArray[1] = new JPanel();
+        TypistSummaryArray[2] = new JPanel();
+        TypistSummaryArray[3] = new JPanel();
+        TypistSummaryArray[4] = new JPanel();
+        TypistSummaryArray[5] = new JPanel();
+
+
+
+        JLabel[] typistSummaryNames = new JLabel[6];
         
+        //We make an array of Typist2s to store the data
+        Typist2[] typistDataArray = new Typist2[6];
+        JButton[] typistDataButtons = new JButton[6];
+        Border[] typistSummaryBorders = new Border[6];
+        for (int i = 0; i < 6; i++) {
+            typistDataArray[i] = new Typist2('a', ("Player " + (i + 1)), 0.5);
+            typistDataArray[i].setTypingStyle("Hunt and Peck");
+            typistDataArray[i].setKeyboardType("Mechanical");
+            typistDataArray[i].setAccessory("Wrist Support");
+            typistDataArray[i].updateStats();
+
+        }
+        for (int i = 0; i < 6; i++) {
+                    typistSummaryNames[i] = new JLabel("<html>" + typistDataArray[i].getName() + "<br>" + "Accuracy: " + typistDataArray[i].getAccuracy() + "<br>" + "Slide Back Amount: " + typistDataArray[i].getSlideBackAmount() + "<br>" + "Burnout Risk: " + typistDataArray[i].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + typistDataArray[i].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + typistDataArray[i].getSlideBackRisk() + "</html>");
+                    TypistSummaryArray[i].add(typistSummaryNames[i]);
+
+                    typistDataButtons[i] = new JButton("Show Detailed Breakdown");
+                    TypistSummaryArray[i].add(typistDataButtons[i]);
+
+                    
+
+                    TypistSummaryArray[i].setLayout(new BoxLayout(TypistSummaryArray[i], BoxLayout.Y_AXIS));
+
+                    typistSummaryBorders[i] = BorderFactory.createLineBorder(Color.red, 1);
+                    TypistSummaryArray[i].setBorder(typistSummaryBorders[i]);
+
+                    typistInfo.add(TypistSummaryArray[i]);
+                    //Add event listenrs to the inputs to update the typist data and summary when they are changed.
+                    final int x = i;
+
+                    typistDataButtons[i].addActionListener(new ActionListener() {
+                        @Override
+                        public void actionPerformed(ActionEvent evt) {
+                            detailedBreakdown(typistDataArray[x]);
+                        }
+                    });
+
+                    typingStyleSelectionArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setTypingStyle((String) typingStyleSelectionArray[x].getSelectedItem());
+                            typistDataArray[x].updateStats();
+                            typistSummaryNames[x].setText("<html>" + typistDataArray[x].getName() + "<br>" + "Accuracy: " + typistDataArray[x].getAccuracy() + "<br>" + "Slide Back Amount: " + typistDataArray[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + typistDataArray[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + typistDataArray[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + typistDataArray[x].getSlideBackRisk() + "</html>");
+
+                        }
+                    });
+                    KeyboardSelectionArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setKeyboardType((String) KeyboardSelectionArray[x].getSelectedItem());
+                            typistDataArray[x].updateStats();
+                            typistSummaryNames[x].setText("<html>" + typistDataArray[x].getName() + "<br>" + "Accuracy: " + typistDataArray[x].getAccuracy() + "<br>" + "Slide Back Amount: " + typistDataArray[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + typistDataArray[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + typistDataArray[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + typistDataArray[x].getSlideBackRisk() + "</html>");
+
+                        }
+                    });
+                    AccessoriesSelectionArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setAccessory((String) AccessoriesSelectionArray[x].getSelectedItem());
+                            typistDataArray[x].updateStats();
+                            typistSummaryNames[x].setText("<html>" + typistDataArray[x].getName() + "<br>" + "Accuracy: " + typistDataArray[x].getAccuracy() + "<br>" + "Slide Back Amount: " + typistDataArray[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + typistDataArray[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + typistDataArray[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + typistDataArray[x].getSlideBackRisk() + "</html>");
+
+                        }
+                    });
+                    playerNamesArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setName(playerNamesArray[x].getText());
+                            typistSummaryNames[x].setText("<html>" + typistDataArray[x].getName() + "<br>" + "Accuracy: " + typistDataArray[x].getAccuracy() + "<br>" + "Slide Back Amount: " + typistDataArray[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + typistDataArray[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + typistDataArray[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + typistDataArray[x].getSlideBackRisk() + "</html>");
+
+                        }
+                    });
+                    symbolFieldArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setSymbol(symbolFieldArray[x].getText().charAt(0));
+                        }
+                    });
+                     ColorSelectionArray[i].addActionListener (new ActionListener () {
+                        public void actionPerformed(ActionEvent e) {
+                            typistDataArray[x].setColour((String) ColorSelectionArray[x].getSelectedItem());
+                            if(typistDataArray[x].getColour().equals("Red")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.red, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Blue")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.blue, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Green")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.green, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Yellow")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.yellow, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Pink")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.pink, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Cyan")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.cyan, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Magenta")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.magenta, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Orange")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.orange, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Gray")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.gray, 1);
+                            }
+                            else if(typistDataArray[x].getColour().equals("Black")) {
+                                typistSummaryBorders[x] = BorderFactory.createLineBorder(Color.black, 1);
+                            }
+                            TypistSummaryArray[x].setBorder(typistSummaryBorders[x]);
+
+                        }
+                    });
+
+
+
+        }
+
         slide.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent e) {
                 if(lastNum != slide.getValue()){
-
                     //Here we update a set of inputs - 
-                    //so java C:\Users\danie\Desktop\button.javayou have the same amount as the thing on the listener
+                    //so you have the same amount as the thing on the listener
+                    //We also update the outputs
+                    //java C:\Users\danie\Desktop\button.java
                     for(int i = 5; i >= slide.getValue(); i--){
                         TypistNumSelection.remove(TypistArray[i]);
+                        typistInfo.remove(TypistSummaryArray[i]);
+
                     }
                     for(int i = lastNum; i < slide.getValue(); i++){
                         TypistNumSelection.add(TypistArray[i]);
+                        typistInfo.add(TypistSummaryArray[i]);
                     }
 
                     updateLast(slide.getValue());
+
+                    TypistNumSelection.revalidate();
+                    TypistNumSelection.repaint();
                     
                 }
                 
@@ -248,7 +403,6 @@ class setupGUI{
 
         
 
-        //
         //The Global modifiers are here
 
         JPanel globalModifiers = new JPanel();
@@ -286,15 +440,13 @@ class setupGUI{
 
         
 
-        
+        f.add(TypistNumSelection);
+        f.add(typistInfo);
+        f.add(globalModifiers);
 
-        mainFrame.add(TypistNumSelection);
-        mainFrame.add(typistInfo);
-        mainFrame.add(globalModifiers);
+        f.setSize(1400, 1000);
 
-        mainFrame.setSize(1000, 1000);
-
-        mainFrame.setVisible(true);
+        f.setVisible(true);
     }
     public void updateLast(int x){
 
@@ -444,6 +596,10 @@ class endRaceGui{
 
 }
 class raceGUI{
+    public static void main(String[] args) {
+        setupGUI x = new setupGUI();
+
+    }
 
 }
 

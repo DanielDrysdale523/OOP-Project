@@ -241,6 +241,43 @@ class setupGUI{
         
 
         //
+         //The Global modifiers are here
+
+        JPanel globalModifiers = new JPanel();
+        globalModifiers.setLayout(new BoxLayout(globalModifiers, BoxLayout.Y_AXIS));
+        globalModifiers.setPreferredSize(new Dimension(1200, 200));
+
+
+        JComboBox<String> globalmodifiersSelection = new JComboBox<>(new String[] {"No  Modifiers", "Autocorrect On", "Caffine Mode", "Night Shift", "All Modifiers"});
+        JComboBox<String> passageLengthSecelction = new JComboBox<>(new String[] {"Short Passage", "Medium Passage", "Long Passage", "Random Length Passage"});
+        Button StartRaceButton = new Button("Start Race!");
+        StartRaceButton.setPreferredSize(new Dimension(200, 50));
+        JPanel globalModifiersSelect = new JPanel();
+
+        globalModifiersSelect.add(new JLabel("Global Modifiers:"));
+        globalModifiersSelect.add(globalmodifiersSelection);
+        globalModifiers.add(globalModifiersSelect);
+
+        JPanel passageLenSelect = new JPanel();
+
+        passageLenSelect.add(new JLabel("Passage Length:"));
+        passageLenSelect.add(passageLengthSecelction);
+        globalModifiers.add(passageLenSelect);
+
+        JPanel starRacePanel = new JPanel();
+
+        starRacePanel.add(StartRaceButton);
+        globalModifiers.add(starRacePanel);
+
+        StartRaceButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+               //Call a function to start the race here
+            }
+        });
+
+        
+
         
 
         mainFrame.add(TypistNumSelection);
@@ -252,6 +289,141 @@ class setupGUI{
     public void updateLast(int x){
 
             lastNum = x;
+    }
+
+    public void detailedBreakdown(Typist2 typist){
+        //This is where we will make a pop up with the detailed breakdown of the stats - this is called when the user clicks the "Show Detailed Breakdown" button on a typist summary.
+        //Pull up a new window for it
+        JFrame brakdown = new JFrame();
+        brakdown.setLayout(new FlowLayout());
+        brakdown.setTitle("Detailed Breakdown of " + typist.getName());
+
+        //So now, I get the data from the typist, and display it in a nice way on the window.
+        String typingStyle = typist.getTypingStyle();
+        String keyboardType = typist.getKeyboardType();
+        String accessories = typist.getAccessory();
+
+        //Find base stats from typing style for display
+        int tempaccuracyTimes100 = 0;
+        int tempSlideBackAmount = 0;
+        int tempslideBackChanceTimes100 = 0;
+        int tempBurnoutAmount = 0;
+        int tempBurnoutTimes1000 = 0;
+
+        if(typingStyle.equals("Hunt and Peck")){
+            //low slideback risk, but high burnout risk and less accuracy.
+            //Shorter burnouts
+            tempaccuracyTimes100 = 40;
+            tempSlideBackAmount = 5;
+            tempslideBackChanceTimes100 = 10;
+            tempBurnoutAmount = 3;
+            tempBurnoutTimes1000 = 150;
+        }
+        else if(typingStyle.equals("Touch Typing")){
+            //Generally balacnced, with a slightly higher burnout risk and slightly lower slide back risk.
+            //High accuracy
+            tempaccuracyTimes100 = 60;
+            tempSlideBackAmount = 4;
+            tempslideBackChanceTimes100 = 12;
+            tempBurnoutAmount = 5;
+            tempBurnoutTimes1000 = 130;       
+        }
+        else if(typingStyle.equals("Phone Thumbs")){
+            //Low burnout stats, but high slide back frequency.
+            //average accuracy
+            tempaccuracyTimes100 = 50;
+            tempSlideBackAmount = 5;
+            tempslideBackChanceTimes100 = 25;
+            tempBurnoutAmount = 3;
+            tempBurnoutTimes1000 = 90;
+        }
+        else if(typingStyle.equals("Voice to Text")){
+            //LOW slide back, but  high burnout risk and recovery time.
+            //average accuracy
+            tempaccuracyTimes100 = 50;
+            tempSlideBackAmount = 3;
+            tempslideBackChanceTimes100 = 10;
+            tempBurnoutAmount = 6;
+            tempBurnoutTimes1000 = 150;
+           
+        }
+        JLabel baseStats = new JLabel("<html>" + "Typing Style: " + typingStyle + "<br>" + "Base Accuracy: " + tempaccuracyTimes100/100.0 + "<br>" + "Base Slide Back Amount: " + tempSlideBackAmount + "<br>" + "Base Slide Back Chance: " + tempslideBackChanceTimes100/100.0 + "<br>" + "Base Burnout Amount: " + tempBurnoutAmount + "<br>" + "Base Burnout Risk: " + tempBurnoutTimes1000/10000.0 + "</html>");
+        brakdown.add(baseStats);
+
+        //Now We get modifier for keyboard type
+        tempaccuracyTimes100 = 0;
+        tempSlideBackAmount = 0;
+        tempslideBackChanceTimes100 = 0;
+        tempBurnoutAmount = 0;
+        tempBurnoutTimes1000 = 0;
+
+
+        if(keyboardType.equals("Mechanical")){
+            //Lower burnout risk, but higher slide back risk.
+            //Higher accuracy
+            tempBurnoutTimes1000 =  - 20;
+            tempslideBackChanceTimes100 =  + 3;
+            tempaccuracyTimes100 =  + 10;
+
+
+        }
+        else if(keyboardType.equals("Membrane")){
+            //lower risks, but higher amounts
+            tempBurnoutTimes1000 =  - 10;
+            tempslideBackChanceTimes100 =  - 3;
+            tempSlideBackAmount =  + 1;
+            tempBurnoutAmount =  + 1;
+
+        }
+        else if(keyboardType.equals("Touchscreen")){
+            //Higher slide back risk, but lower slide back amount.
+            tempslideBackChanceTimes100 =  + 5;
+            tempSlideBackAmount =  -1;
+
+        }
+        else if(keyboardType.equals("Sternography")){
+            //Lower slide back risk(-4), but higher burnout risk and recovery time.
+            //Higher accuracy
+            tempslideBackChanceTimes100 =  -4;
+            tempBurnoutTimes1000 =  + 10;
+            tempBurnoutAmount =  + 1;
+            tempaccuracyTimes100 =  + 10;
+        }
+        JLabel keyboardStats = new JLabel("<html>" + "Keyboard Type: " + keyboardType + "<br>" + "Accuracy Modifier: " + tempaccuracyTimes100/100.0 + "<br>" + "Slide Back Amount Modifier: " + tempSlideBackAmount + "<br>" + "Slide Back Chance Modifier: " + tempslideBackChanceTimes100/100.0 + "<br>" + "Burnout Amount Modifier: " + tempBurnoutAmount + "<br>" + "Burnout Risk Modifier: " + tempBurnoutTimes1000/10000.0 + "</html>");
+        brakdown.add(keyboardStats);
+        //Now we get modifiers for accessories
+        tempaccuracyTimes100 = 0;
+        tempSlideBackAmount = 0;  
+        tempslideBackChanceTimes100 = 0;
+        tempBurnoutAmount = 0;
+        tempBurnoutTimes1000 = 0;
+
+
+        if(accessories.equals("Wrist Support")){
+            //improves burnout recovery time
+            tempBurnoutAmount =  - 1;
+        }
+        else if(accessories.equals("Energy Drink")){
+            //improves burnout risk
+            tempBurnoutTimes1000 =  - 5;
+
+        }
+        else if(accessories.equals("Noise-Canceling Headphones")){
+            //improves accuracy
+            tempaccuracyTimes100 =  + 5;
+
+        }
+        else if(accessories.equals("Ergonomic Chair")){
+            //improves slide back risk
+            tempslideBackChanceTimes100 =  - 3;
+
+        }
+        JLabel accessoriesStats = new JLabel("<html>" + "Accessories: " + accessories + "<br>" + "Accuracy Modifier: " + tempaccuracyTimes100/100.0 + "<br>" + "Slide Back Amount Modifier: " + tempSlideBackAmount + "<br>" + "Slide Back Chance Modifier: " + tempslideBackChanceTimes100/100.0 + "<br>" + "Burnout Amount Modifier: " + tempBurnoutAmount + "<br>" + "Burnout Risk Modifier: " + tempBurnoutTimes1000/10000.0 + "</html>");
+        brakdown.add(accessoriesStats);
+
+
+        brakdown.setSize(600, 200);
+        brakdown.setVisible(true);
     }
 
 }

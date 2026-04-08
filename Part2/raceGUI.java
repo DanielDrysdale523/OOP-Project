@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -65,6 +67,12 @@ class setupGUI{
         Border blackline = BorderFactory.createLineBorder(Color.gray, 1);
 
         TypistNumSelection.setBorder(blackline);
+
+        //Adding Title
+        JLabel title = new JLabel("Typist Selection");
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+        title.setFont(new Font("Serif", Font.BOLD, 24));
+        TypistNumSelection.add(title);
 
 
         JSlider slide = new JSlider(JSlider.HORIZONTAL, 2, 6, 6);
@@ -241,7 +249,7 @@ class setupGUI{
         
 
         //
-         //The Global modifiers are here
+        //The Global modifiers are here
 
         JPanel globalModifiers = new JPanel();
         globalModifiers.setLayout(new BoxLayout(globalModifiers, BoxLayout.Y_AXIS));
@@ -281,6 +289,8 @@ class setupGUI{
         
 
         mainFrame.add(TypistNumSelection);
+        mainFrame.add(typistInfo);
+        mainFrame.add(globalModifiers);
 
         mainFrame.setSize(1000, 1000);
 

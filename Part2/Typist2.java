@@ -1,355 +1,293 @@
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
 /**
- * A typing race simulation. Three typists race to complete a passage of text,
- * advancing character by character — or sliding backwards when they mistype.
+ * 
  *
- * Originally written by Ty Posaurus, who left this project to "focus on his
- * two-finger technique". He assured us the code was "basically done".
- * We have found evidence to the contrary.
+ * Provides an object to serve as a racer in the racing game, with more attributes and deeper customization options.
  *
- * @author Daniel Drysdale
- * @version 1.0 
+ * @author DanielDrysdale
+ * @version 1.0
  */
-public class TypingRace2
+public class Typist2 extends Typist
 {
-    private int passageLength;   // Total characters in the passage to type
-    private Typist2[] TypistArray;
+    //The Fields represent the new attributes available
+    private String typingStyle;
+    private String keyboardType;
+    private String accessories;
+    private String color;
+    //These Next feilds are representive of the new statistics that the typist will have.
 
-    // Accuracy thresholds for mistype and burnout events
-    // (Ty tuned these values "by feel". They may need adjustment.)
-    private static final double MISTYPE_BASE_CHANCE = 0.3;
-    private static final int    SLIDE_BACK_AMOUNT   = 3;
-    private static final int    BURNOUT_DURATION     = 3;
+    private int slideBackAmount;
+    private double burnoutRisk;
+    private int burnoutRecoveryTime;
+    private double slideBackRisk;
 
+    //Base attributes are never changed by the options, and are used to calculate the statistics.
+    //All values based around assuming a base typist with 0.5 accuracy
+    //options will increase or decrease the base stats by a given number
+
+    final private double baseAccuracy = 0.5;
+    final private int baseSlideBackAmount = 5;
+    final private double baseBurnoutRisk = 0.0125;
+    final private int baseBurnoutRecoveryTime = 4;
+    final private double baseSlideBackRisk = 0.15;
+
+     // Constructor of class Typist
     /**
-     * Constructor for objects of class TypingRace.
-     * Sets up the race with a passage of the given length.
-     * Initially there are no typists seated.
+     * Constructor for objects of class Typist.
+     * Creates a new typist with a given symbol, name, and accuracy rating.
      *
-     * @param passageLength the number of characters in the passage to type
+     * @param typistSymbol  a single Unicode character representing this typist (e.g. '①', '②', '③')
+     * @param typistName    the name of the typist (e.g. "TURBOFINGERS")
+     * @param typistAccuracy the typist's accuracy rating, between 0.0 and 1.0
      */
-    public TypingRace2(int passageLength)
-    {
-        this.passageLength = passageLength;
-        TypistArray = new Typist2[0];
+    public Typist2(char typistSymbol, String typistName, double typistAccuracy) {
+        super(typistSymbol, typistName, typistAccuracy);
+        slideBackAmount = baseSlideBackAmount;
+        burnoutRisk = baseBurnoutRisk;
+        burnoutRecoveryTime = baseBurnoutRecoveryTime;
+        slideBackRisk = baseSlideBackRisk;
     }
 
     /**
-     * Seats a typist at the given seat number (1, 2, or 3).
+     * Sets the typing style for the typist.
      *
-     * @param theTypist  the typist to seat
-     * @param seatNumber the seat to place them in (1–3)
+     * @param style; the typing style to set the typist style to.
+     * Valid styles are: "Hunt and Peck", "Touch Typing", "Phone Thumbs", "Voice to Text"
      */
-   public void addTypist(Typist2 theTypist, int seatNumber)
-    {
-        if(TypistArray == null){
-            TypistArray = new Typist2[1];
-            TypistArray[0] = theTypist;
-            return;
-        }
-        if (seatNumber < TypistArray.length){
-            TypistArray[seatNumber] = theTypist;
-            
-        }else if(TypistArray.length < 6){
-            Typist2[] newArray = new Typist2[TypistArray.length + 1];
-            System.out.println(newArray.length);
-            for(int i = 0; i < TypistArray.length; i++){
-                newArray[i] = TypistArray[i];
-            }
-            newArray[newArray.length - 1] = theTypist;
-            
-            TypistArray = newArray;
-        }else{
-            System.out.println("Too many typists! Max is 6.");
-        }
-    }
-
-    /**
-     * Starts the typing race.
-     * All typists are reset to the beginning, then the simulation runs
-     * turn by turn until one typist completes the full passage.
-     */
-    public void startRace()
-    {
-        boolean finished = false;
-
-        // Reset all typists to the start of the passage
-        for(int i = 0; i < TypistArray.length; i++){
-            TypistArray[i].resetToStart();
-        }
-        
-
-        while (!finished)
-        {
-            // Advance each typist by one turn
-            Boolean[] didPassArray = new Boolean[6];
-            for(int i = 0; i < TypistArray.length; i++){
-                didPassArray[i] = advanceTypist(TypistArray[i]);
-            }
-
-            // Print the current state of the race
-            printRace(didPassArray);
-
-            // Check if any typist has finished the passage
-            for(int i = 0; i < TypistArray.length; i++){
-                 if ( raceFinishedBy(TypistArray[i])){
-                     finished = true;
-                 }
-            }
-
-            // Wait 200ms between turns so the animation is visible
-            try {
-                TimeUnit.MILLISECONDS.sleep(200);
-            } catch (Exception e) {}
-        }
-        // Announce the winner and update their accuracy with a small random boost for winning.
-        if(finished){
-                    Random random = new Random();
-
-                if(raceFinishedBy(TypistArray[0])){
-                System.out.println("And the Winner is ..." + TypistArray[0].getName());
-                Double x = TypistArray[0].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[0].setAccuracy(x/100.0);
-                return;
-            }else if(raceFinishedBy(TypistArray[1])){
-                System.out.println("And the Winner is ..." + TypistArray[1].getName());
-                Double x = TypistArray[1].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[1].setAccuracy(x/100.0);
-                return;
-        
-            }else if(raceFinishedBy(TypistArray[2])){
-                System.out.println("And the Winner is ..." + TypistArray[2].getName());
-                Double x = TypistArray[2].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[2].setAccuracy(x/100.0);
-                return;
-    
-            }
-            else if(raceFinishedBy(TypistArray[3])){
-                System.out.println("And the Winner is ..." + TypistArray[3].getName());
-                Double x = TypistArray[3].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[3].setAccuracy(x/100.0);
-                return;
-            }else if(raceFinishedBy(TypistArray[4])){
-                System.out.println("And the Winner is ..." + TypistArray[4].getName());
-                Double x = TypistArray[4].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[4].setAccuracy(x/100.0);
-                return;
-        
-            }else if(raceFinishedBy(TypistArray[5])){
-                System.out.println("And the Winner is ..." + TypistArray[5].getName());
-                Double x = TypistArray[5].getAccuracy() * 100 + random.nextInt(5);
-                TypistArray[5].setAccuracy(x/100.0);
-                return;
-    
-            }
-                
-        }
-        
-    }
-
-    /**
-     * Simulates one turn for a typist.
-     *
-     * If the typist is burnt out, they recover one turn's worth and skip typing.
-     * Otherwise:
-     *   - They may type a character (advancing progress) based on their accuracy.
-     *   - They may mistype (sliding back) — the chance of a mistype should decrease
-     *     for more accurate typists.
-     *   - They may burn out — more likely for very high-accuracy typists
-     *     who are pushing themselves too hard.
-     *
-     * @param theTypist the typist to advance
-     */
-    private Boolean advanceTypist(Typist2 theTypist)
-    {
-        Boolean returnValue = false;
-        if (theTypist.isBurntOut())
-        {
-            // Recovering from burnout — skip this turn
-            theTypist.recoverFromBurnout();
-            return false;
-        }
-        // Burnout check — pushing too hard increases burnout risk
-        //You first see if you burnout.
-        if (Math.random() < theTypist.getBurnoutRisk())
-        {
-            Random random = new Random();
-            theTypist.burnOut(theTypist.getBurnoutRecoveryTime());
-            //If you burn out, you loose 0.01 accuracy
-            Double x = theTypist.getAccuracy() * 100 - random.nextInt(3);;
-            theTypist.setAccuracy(x/100.0);
-        }else{
-            //So, if you dont burn out, you can try typing
-            // Attempt to type a charecter, then check for mistype.
-                if (Math.random() < theTypist.getAccuracy())
-                {
-                    theTypist.typeCharacter();
-                }else if(Math.random() < theTypist.getSlideBackRisk()){
-                    //failed to type a character, so will slideback
-                    theTypist.slideBack(theTypist.getSlideBackAmount());
-                    returnValue = true;
-                }
-            
-            
-        }
-
-         
-
-        
-        return returnValue;
-    }
-
-    /**
-     * Returns true if the given typist has completed the full passage.
-     *
-     * @param theTypist the typist to check
-     * @return true if their progress has reached or passed the passage length
-     */
-    private boolean raceFinishedBy(Typist theTypist)
-    {
-        // In case of overflow, use >=
-        if (theTypist == null)
-        {
-            return false; // No typist in this seat, so can't finish
-        }
-        if (theTypist.getProgress() >= passageLength)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    /**
-     * Prints the current state of the race to the terminal.
-     * Shows each typist's position along the passage, burnout state,
-     * and a WPM estimate based on current progress.
-     */
-    private void printRace(Boolean[] did1Fall)
-    {
-        System.out.print('\u000C'); // Clear terminal
-
-        System.out.println("  TYPING RACE — passage length: " + passageLength + " chars");
-        multiplePrint('=', passageLength + 3);
-        System.out.println();
-        for(int i = 0; i < TypistArray.length; i++){
-            printSeat(TypistArray[i], did1Fall[i]);
-            System.out.println();
-        }
-
-        multiplePrint('=', passageLength + 3);
-        System.out.println();
-        System.out.println("  [~] = burnt out    [<] = just mistyped");
-    }
-
-    /**
-     * Prints a single typist's lane.
-     *
-     * Examples:
-     *   |          ⌨           | TURBOFINGERS (Accuracy: 0.85)
-     *   |    [zz]               | HUNT_N_PECK  (Accuracy: 0.40) BURNT OUT (2 turns)
-     *
-     * Note: Ty forgot to show when a typist has just mistyped. That would
-     * be a nice improvement — perhaps a [<] marker after their symbol.
-     *
-     * @param theTypist the typist whose lane to print
-     */
-    private void printSeat(Typist2 theTypist, Boolean didStall)
-    {
-        int spacesBefore = theTypist.getProgress();
-        int spacesAfter  = passageLength - theTypist.getProgress();
-        if(spacesBefore >= passageLength){
-            System.out.print('|');
-            multiplePrint(' ', passageLength);
-            System.out.print(theTypist.getSymbol());
-            System.out.print('|');
-            System.out.print(' ');
-            System.out.print(theTypist.getName()
-                + " (Accuracy: " + theTypist.getAccuracy() + ")");
-            return;
-            
-        }
-
-        System.out.print('|');
-        multiplePrint(' ', spacesBefore);
-
-        // Always show the typist's symbol so they can be identified on screen.
-        // Append ~ when burnt out so the state is visible without hiding identity.
-        System.out.print(theTypist.getSymbol());
-        if (theTypist.isBurntOut())
-        {
-            System.out.print('~');
-            spacesAfter--; // symbol + ~ together take two characters
-        }
-        if(didStall){
-            System.out.print("[<]");
-            spacesAfter--;
-            spacesAfter--;
-            spacesAfter--;// symbol + [<] together take 4 characters
-        }
-
-        multiplePrint(' ', spacesAfter);
-        System.out.print('|');
-        System.out.print(' ');
-
-        // Print name and accuracy
-        if (theTypist.isBurntOut())
-        {
-            System.out.print(theTypist.getName()
-                + " (Accuracy: " + theTypist.getAccuracy() + ")"
-                + " BURNT OUT (" + theTypist.getBurnoutTurnsRemaining() + " turns)");
-            if(didStall){
-                System.out.print(" <- JUST MISYPED");
+    public void setTypingStyle(String style){
+        final String[] ValidStyles = {"Hunt and Peck", "Touch Typing", "Phone Thumbs", "Voice to Text"};
+        for (int i = 0; i < ValidStyles.length; i++) {
+            if (ValidStyles[i].equals(style)) {
+                typingStyle = style;
+                i = ValidStyles.length;
             }
         }
-        else
-        {
-            System.out.print(theTypist.getName()
-                + " (Accuracy: " + theTypist.getAccuracy() + ")");
-            if(didStall){
-                System.out.print(" <- JUST MISYPED");
+    }
+    /**
+     * Sets the keyboard type for the typist.
+     *
+     * @param keyboard; the keyboard type to set the typist's keyboard to.
+     * Valid keyboard types are: "Mechanical", "Membrane", "Touchscreen", "Sternography"
+     */
+    public void setKeyboardType(String keyboard){
+        final String[] KeyboardTypes = {"Mechanical", "Membrane", "Touchscreen", "Sternography"};
+        for (int i = 0; i < KeyboardTypes.length; i++) {
+            if (KeyboardTypes[i].equals(keyboard)) {
+                keyboardType = keyboard;
+                i = KeyboardTypes.length;
             }
         }
-        
+    }
+    /**
+     * sets the Accessory type for the typist.
+     *
+     * @param accessory; the accessory type to set the typist's accessory to.
+     * Valid accessory types are: 
+     * "Wrist Support", "Energy Drink", "Noise-Canceling Headphones", "Ergonomic Chair"
+     */
+    public void setAccessory(String accessory){
+        final String[] Accessories = {"Wrist Support", "Energy Drink", "Noise-Canceling Headphones", "Ergonomic Chair"};
+        for (int i = 0; i < Accessories.length; i++) {
+            if (Accessories[i].equals(accessory)) {
+                accessories = accessory;
+                i = Accessories.length;
+            }
+        }
     }
 
     /**
-     * Prints a character a given number of times.
+     * Sets the color of the typist.
      *
-     * @param aChar the character to print
-     * @param times how many times to print it
+     * @param colour; the color to set the typist's color to.
+     * Valid colors are: 
+     * "Red", "Blue", "Green", "Yellow", "Pink", "Cyan", "Magenta", "Orange", "Gray", "Black"
      */
-    private void multiplePrint(char aChar, int times)
-    {
-        int i = 0;
-        while (i < times)
-        {
-            System.out.print(aChar);
-            i = i + 1;
+    public void setColour(String colour){
+        final String[] Colours = {"Red", "Blue", "Green", "Yellow", "Pink", "Cyan", "Magenta", "Orange", "Gray", "Black"};
+        for (int i = 0; i < Colours.length; i++) {
+            if (Colours[i].equals(colour)) {
+                color = colour;
+                i = Colours.length;
+            }
         }
     }
 
-    public void setRaceLength(int length){
-        passageLength = length;
+    //Getter methods
+    /**
+     * Returns the typist's typing style.
+     *
+     * @return the typing style as a String
+     */
+    public String getTypingStyle(){
+        return typingStyle;
     }
-    public TypingRace2() {
+    /**
+     * Returns the typist's keyboard type.
+     *
+     * @return the keyboard type as a String
+     */
+    public String getKeyboardType(){
+        return keyboardType;
     }
-    
-    public void main(String a1[]) {
-        Typist2 a = new Typist2('7', "75%", 0.75);
-        Typist2 b = new Typist2('5', "50%", 0.5);
-        Typist2 c = new Typist2('2', "25%", 0.25);
-        addTypist(a, 1);
-        addTypist(b, 2);
-        addTypist(c, 3);
-        passageLength = 15;
-        startRace();
-     }
-     
+    /**
+     * Returns the typist's accessory type.
+     *
+     * @return the accessory type as a String
+     */
+    public String getAccessory(){
+        return accessories;
+    }
+    /**
+     * Returns the typist's color.
+     *
+     * @return the color as a String
+     */
+    public String getColour(){
+        return color;
+    }
+    /**
+     * Returns the typist's Slide Back amount.
+     *
+     * @return the Slide Back amount as an int
+     */
+    public int getSlideBackAmount(){
+        return slideBackAmount;
+    }
+    /**
+     * Returns the typist's Burnout Risk.
+     *
+     * @return the Burnout Risk as a double
+     */
+    public double getBurnoutRisk(){
+        return burnoutRisk;
+    }
+    /**
+     * Returns the typist's Burnout Recovery Time.
+     *
+     * @return the Burnout Recovery Time as an int
+     */
+    public int getBurnoutRecoveryTime(){
+        return burnoutRecoveryTime;
+    }
+    /**
+     * Returns the typist's Slide Back Risk.
+     *
+     * @return the Slide Back Risk as a double
+     */
+    public double getSlideBackRisk(){
+        return slideBackRisk;
+    }
+
+
+    /**
+     * Updates the statistics for the typist.
+     * Method should be called whenever an attribute is changed, 
+     * to ensure that the statistics are up to date.
+     */
+    public void updateStats(){
+
+        int tempaccuracyTimes100 = 0;
+        int tempSlideBackAmount = 0;
+        int tempslideBackChanceTimes100 = 0;
+        int tempBurnoutAmount = 0;
+        int tempBurnoutTimes1000 = 0;
         
+        //First, modififiers based on typing style
+        if(typingStyle.equals("Hunt and Peck")){
+            //low slideback risk, but high burnout risk and less accuracy.
+            //Shorter burnouts
+            tempaccuracyTimes100 = 40;
+            tempSlideBackAmount = 5;
+            tempslideBackChanceTimes100 = 10;
+            tempBurnoutAmount = 3;
+            tempBurnoutTimes1000 = 150;
+        }
+        else if(typingStyle.equals("Touch Typing")){
+            //Generally balacnced, with a slightly higher burnout risk and slightly lower slide back risk.
+            //High accuracy
+            tempaccuracyTimes100 = 60;
+            tempSlideBackAmount = 4;
+            tempslideBackChanceTimes100 = 12;
+            tempBurnoutAmount = 5;
+            tempBurnoutTimes1000 = 130;       
+        }
+        else if(typingStyle.equals("Phone Thumbs")){
+            //Low burnout stats, but high slide back frequency.
+            //average accuracy
+            tempaccuracyTimes100 = 50;
+            tempSlideBackAmount = 5;
+            tempslideBackChanceTimes100 = 25;
+            tempBurnoutAmount = 3;
+            tempBurnoutTimes1000 = 90;
+        }
+        else if(typingStyle.equals("Voice to Text")){
+            //LOW slide back, but  high burnout risk and recovery time.
+            //average accuracy
+            tempaccuracyTimes100 = 50;
+            tempSlideBackAmount = 3;
+            tempslideBackChanceTimes100 = 10;
+            tempBurnoutAmount = 6;
+            tempBurnoutTimes1000 = 150;
+           
+        }
+
+        //Then, modifiers based on keyboard type
+        if(keyboardType.equals("Mechanical")){
+            //Lower burnout risk, but higher slide back risk.
+            //Higher accuracy
+            tempBurnoutTimes1000 = tempBurnoutTimes1000 - 20;
+            tempslideBackChanceTimes100 = tempslideBackChanceTimes100 + 3;
+            tempaccuracyTimes100 = tempaccuracyTimes100 + 10;
+
+
+        }
+        else if(keyboardType.equals("Membrane")){
+            //lower risks, but higher amounts
+            tempBurnoutTimes1000 = tempBurnoutTimes1000 - 10;
+            tempslideBackChanceTimes100 = tempslideBackChanceTimes100 - 3;
+            tempSlideBackAmount = tempSlideBackAmount + 1;
+            tempBurnoutAmount = tempBurnoutAmount + 1;
+
+        }
+        else if(keyboardType.equals("Touchscreen")){
+            //Higher slide back risk, but lower slide back amount.
+            tempslideBackChanceTimes100 = tempslideBackChanceTimes100 + 5;
+            tempSlideBackAmount = tempSlideBackAmount - 1;
+
+        }
+        else if(keyboardType.equals("Sternography")){
+            //Lower slide back risk(-4), but higher burnout risk and recovery time.
+            //Higher accuracy
+            tempslideBackChanceTimes100 = tempslideBackChanceTimes100 - 4;
+            tempBurnoutTimes1000 = tempBurnoutTimes1000 + 10;
+            tempBurnoutAmount = tempBurnoutAmount + 1;
+            tempaccuracyTimes100 = tempaccuracyTimes100 + 10;
+        }
+        //Finally, modifiers based on accessories
+        if(accessories.equals("Wrist Support")){
+            //improves burnout recovery time
+            tempBurnoutAmount = tempBurnoutAmount - 1;
+        }
+        else if(accessories.equals("Energy Drink")){
+            //improves burnout risk
+            tempBurnoutTimes1000 = tempBurnoutTimes1000 - 5;
+
+        }
+        else if(accessories.equals("Noise-Canceling Headphones")){
+            //improves accuracy
+            tempaccuracyTimes100 = tempaccuracyTimes100 + 5;
+
+        }
+        else if(accessories.equals("Ergonomic Chair")){
+            //improves slide back risk
+            tempslideBackChanceTimes100 = tempslideBackChanceTimes100 - 3;
+
+        }
+        //Now set the values to the calculated temp values.
+        setAccuracy(tempaccuracyTimes100/100.0);
+        slideBackAmount = tempSlideBackAmount;
+        slideBackRisk = (tempslideBackChanceTimes100/100.0);
+        burnoutRecoveryTime = tempBurnoutAmount;
+        burnoutRisk = (tempBurnoutTimes1000/10000.0); 
+    }
 
 }

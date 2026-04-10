@@ -66,6 +66,31 @@ public class TypingRace2
     }
 
     /**
+     * Runs a single turn for the typingRace, returning a boolean 
+     * for whether the race was finished - returning false if not.
+     * turn by turn until one typist completes the full passage.
+     */
+    public Boolean runTurn(){
+        // Advance each typist by one turn
+            Boolean[] didPassArray = new Boolean[6];
+            for(int i = 0; i < TypistArray.length; i++){
+                didPassArray[i] = advanceTypist(TypistArray[i]);
+            }
+
+            // Print the current state of the race
+            printRace(didPassArray);
+
+            // Check if any typist has finished the passage
+            for(int i = 0; i < TypistArray.length; i++){
+                 if ( raceFinishedBy(TypistArray[i])){
+                     return true;
+                 }
+            }
+            return false;
+    }
+
+
+    /**
      * Starts the typing race.
      * All typists are reset to the beginning, then the simulation runs
      * turn by turn until one typist completes the full passage.

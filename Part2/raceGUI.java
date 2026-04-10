@@ -10,7 +10,10 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JTextArea;
 import  javax.swing.JTextField;
+import javax.swing.JTextPane;
+import javax.swing.SwingConstants;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -139,15 +142,7 @@ class setupGUI{
             KeyboardSelectionArray[i] = new JComboBox<>(keyboardTypes);    
         }
 
-        //Symbol  JTextFieldLimit(1): To allow a single char to be inputted
-        JLabel[] symbolLabelArray = new JLabel[6];
-        JTextField[] symbolFieldArray = new JTextField[6];
 
-        for (int i = 0; i < 6; i++) {
-            symbolLabelArray[i] = new JLabel("Symbol:");
-            symbolFieldArray[i] = new JTextField(1);
-            symbolFieldArray[i].setDocument(new JTextFieldLimit(1));
-        }
 
         //Color
         JLabel[] colorLabelArray = new JLabel[6];
@@ -205,8 +200,6 @@ class setupGUI{
             TypistArray[i].add(KeyboardSelectionArray[i]);
             TypistArray[i].add(colorLabelArray[i]);
             TypistArray[i].add(ColorSelectionArray[i]);
-            TypistArray[i].add(symbolLabelArray[i]);
-            TypistArray[i].add(symbolFieldArray[i]);
             TypistArray[i].add(accessoriesLabelArray[i]);
             TypistArray[i].add(AccessoriesSelectionArray[i]);
         }
@@ -239,7 +232,7 @@ class setupGUI{
         JButton[] typistDataButtons = new JButton[6];
         Border[] typistSummaryBorders = new Border[6];
         for (int i = 0; i < 6; i++) {
-            typistDataArray[i] = new Typist2('a', ("Player " + (i + 1)), 0.5);
+            typistDataArray[i] = new Typist2('|', ("Player " + (i + 1)), 0.5);
             typistDataArray[i].setTypingStyle("Hunt and Peck");
             typistDataArray[i].setKeyboardType("Mechanical");
             typistDataArray[i].setAccessory("Wrist Support");
@@ -302,11 +295,7 @@ class setupGUI{
 
                         }
                     });
-                    symbolFieldArray[i].addActionListener (new ActionListener () {
-                        public void actionPerformed(ActionEvent e) {
-                            typistDataArray[x].setSymbol(symbolFieldArray[x].getText().charAt(0));
-                        }
-                    });
+                    
                      ColorSelectionArray[i].addActionListener (new ActionListener () {
                         public void actionPerformed(ActionEvent e) {
                             typistDataArray[x].setColour((String) ColorSelectionArray[x].getSelectedItem());
@@ -603,7 +592,7 @@ class TypingRacer implements Runnable {
     public TypingRace2 setupRace(Typist2[] typistDataArray, int typistCount, String globalModifier){
         // Wait 200ms between turns so the animation is visible
             try {
-                TimeUnit.MILLISECONDS.sleep(2000);
+                TimeUnit.MILLISECONDS.sleep(200);
             } catch (Exception e) {}
 
 
@@ -620,16 +609,23 @@ class TypingRacer implements Runnable {
     
     @Override
     public void run() {
-        // Code that will run in the new thread
-        System.out.println("The thread is running.");
+        // runs through the turns
         TypingRace2 race = setupRace(typistDataArray, typistCount, globalModifier);
         Boolean finished = false;
         while(!finished){
             finished = race.runTurn();
             try {
-                TimeUnit.MILLISECONDS.sleep(2000);
+                TimeUnit.MILLISECONDS.sleep(200);
             } catch (Exception e) {}
-            Thread updateGui = new Thread(new guiUpdater(outputLabel, "F"));
+
+            //String tempOutput = race.TypingRacePrintString(typistCount, passage);
+            String tempOutput = "<HTML>";
+            for(int i = 0; i < typistCount; i++){
+                tempOutput += race.TypingRacePrintString(i, passage) + "<br> <br>";
+            }
+            tempOutput += "</HTML>";
+
+            Thread updateGui = new Thread(new guiUpdater(outputLabel, tempOutput));
             updateGui.start();
 
         }
@@ -645,9 +641,15 @@ class guiUpdater implements Runnable {
     }
     @Override
     public void run() {
-        // Code that will run in the new thread
-        System.out.println("The thread is running.");
-        labelToUpdate.add(new JLabel(newText));
+        // goes through, and replaces the text in the label with the new text.
+        labelToUpdate.removeAll();
+        JLabel x = new JLabel();
+        x.setText(newText);
+        x.setPreferredSize(new Dimension(1200, 800));
+        x.setHorizontalAlignment(SwingConstants.CENTER);
+        x.setVerticalAlignment(SwingConstants.CENTER);
+
+        labelToUpdate.add(x);
         labelToUpdate.revalidate();
         labelToUpdate.repaint();
         return;
@@ -711,24 +713,24 @@ class midRaceGui{
         }
         passage = passageTemp;
 
-        System.out.println(passage);
 
 
         qouteOutput = new JPanel();
         qouteOutput.add(new JLabel("<html><div style='text-align: center;'>" + passage + "</div></html>"));
-
-        f.add(qouteOutput, BorderLayout.NORTH);
-
-        JPanel raceStatus = new JPanel();
-        raceStatus.add(new JButton("POOP"));
-        f.add(raceStatus, BorderLayout.SOUTH);
+        
 
 
+        Border blackline = BorderFactory.createLineBorder(Color.gray, 1);
+
+        qouteOutput.setBorder(blackline);
+        f.add(qouteOutput);
+        f.setLayout(new FlowLayout());
         f.revalidate();
         f.repaint();
+        f.setVisible(true);
+        
 
-        //So, make a runLoop function for typ;ingrace that returns true when someone wins. 
-        //then we use a loop out here to run it once, and update an output
+        
 
 
 

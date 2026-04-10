@@ -78,7 +78,6 @@ public class TypingRace2
             }
 
             // Print the current state of the race
-            printRace(didPassArray);
 
             // Check if any typist has finished the passage
             for(int i = 0; i < TypistArray.length; i++){
@@ -87,6 +86,33 @@ public class TypingRace2
                  }
             }
             return false;
+    }
+
+    /**
+     * Returns a string for a given typist's lane, showing their symbol at the correct position
+     * placed within the passage.
+     *
+     * @param Int index, the typist stored seat number
+     * @param String passage, the passage to be typed
+     * @return a string representing the typist's position in the passage
+
+     */
+
+    public String TypingRacePrintString(int index, String passage) {
+        String returnString = "|";
+        
+        Typist theTypist = TypistArray[index];
+        int spacesBefore = theTypist.getProgress();
+        int spacesAfter  = passageLength - theTypist.getProgress();
+        for(int i = 0; i < spacesBefore; i++){
+            returnString += passage.charAt(i);
+        }
+        returnString += theTypist.getSymbol();
+        for(int i = 0; i < spacesAfter; i++){
+            returnString += passage.charAt(spacesBefore + i);
+        }
+        return returnString + "|";
+        
     }
 
 

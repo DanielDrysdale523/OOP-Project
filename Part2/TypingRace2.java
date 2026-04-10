@@ -23,6 +23,10 @@ public class TypingRace2
     private static final int    SLIDE_BACK_AMOUNT   = 3;
     private static final int    BURNOUT_DURATION     = 3;
 
+    public int slideBackModifier = 0;
+    public int burnoutModifier = 0;
+    public Double accuracyModifier = 0.0;
+
     /**
      * Constructor for objects of class TypingRace.
      * Sets up the race with a passage of the given length.
@@ -99,9 +103,12 @@ public class TypingRace2
      */
 
     public String TypingRacePrintString(int index, String passage) {
-        String returnString = "|";
+
+       
         
         Typist theTypist = TypistArray[index];
+
+         String returnString = theTypist.getName() + ": - |";
         int spacesBefore = theTypist.getProgress();
         int spacesAfter  = passageLength - theTypist.getProgress();
         for(int i = 0; i < spacesBefore; i++){
@@ -226,19 +233,19 @@ public class TypingRace2
         if (Math.random() < theTypist.getBurnoutRisk())
         {
             Random random = new Random();
-            theTypist.burnOut(theTypist.getBurnoutRecoveryTime());
+            theTypist.burnOut(theTypist.getBurnoutRecoveryTime() + burnoutModifier);
             //If you burn out, you loose 0.01 accuracy
             Double x = theTypist.getAccuracy() * 100 - random.nextInt(3);;
             theTypist.setAccuracy(x/100.0);
         }else{
             //So, if you dont burn out, you can try typing
             // Attempt to type a charecter, then check for mistype.
-                if (Math.random() < theTypist.getAccuracy())
+                if (Math.random() < theTypist.getAccuracy() + accuracyModifier)
                 {
                     theTypist.typeCharacter();
                 }else if(Math.random() < theTypist.getSlideBackRisk()){
                     //failed to type a character, so will slideback
-                    theTypist.slideBack(theTypist.getSlideBackAmount());
+                    theTypist.slideBack(theTypist.getSlideBackAmount() + slideBackModifier);
                     returnValue = true;
                 }
             

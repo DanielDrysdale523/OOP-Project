@@ -23,6 +23,12 @@ public class Typist
     private String name;
     private double accuracy;
 
+    public int slideBackCounter = 0;
+    public int successfulTypeCounter = 0;
+    public int burnoutCounter = 0;
+
+
+
 
 
 
@@ -65,6 +71,7 @@ public class Typist
     {
         isBurnedOut = true;
         burnOutTurnsLeft = turns;
+        burnoutCounter = burnoutCounter + 1;
 
     }
 
@@ -169,6 +176,7 @@ public class Typist
     public void typeCharacter()
     {
         currentPlace = currentPlace + 1;
+        successfulTypeCounter = successfulTypeCounter + 1;
 
     }
 
@@ -186,6 +194,8 @@ public class Typist
         else if(amount > currentPlace){
             currentPlace = 0;
         }
+        slideBackCounter = slideBackCounter + 1;
+
 
     }
 

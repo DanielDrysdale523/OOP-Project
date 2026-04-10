@@ -417,6 +417,7 @@ class setupGUI{
 
 
 
+
                 return;
             }
         });
@@ -590,14 +591,27 @@ class TypingRacer implements Runnable {
     }
     
     public TypingRace2 setupRace(Typist2[] typistDataArray, int typistCount, String globalModifier){
-        // Wait 200ms between turns so the animation is visible
-            try {
-                TimeUnit.MILLISECONDS.sleep(200);
-            } catch (Exception e) {}
-
-
+        
         //Start the TypingRaceClass
         TypingRace2 typingRace = new TypingRace2(passage.length());
+
+        if(globalModifier.equals("Autocorrect On")){
+            typingRace.slideBackModifier = -1;
+        }
+        else if(globalModifier.equals("Caffine Mode")){
+            typingRace.burnoutModifier = -1;
+        }
+        else if(globalModifier.equals("Night Shift")){
+            typingRace.accuracyModifier = -0.05;
+        }
+        else if(globalModifier.equals("All Modifiers")){
+            typingRace.accuracyModifier = -0.05;
+            typingRace.slideBackModifier = -1;
+            typingRace.burnoutModifier = -1;
+        }
+        
+
+
         for(int i = 0; i < typistCount; i++){
             typingRace.addTypist(typistDataArray[i], i);
         }
@@ -666,10 +680,10 @@ class midRaceGui{
     "Argel Tal often said that Fate had a vicious sense of humour. Khârn never doubted it for a second.", 
     "Nature of a compromise is that it leaves everyone more or less equally unhappy.", 
     "This was it. Finally, everyone was working together.", 
-    "Freedom is the only thing worth fighting for.     It is why tyrants always fall."};
+    "Freedom is the only thing worth fighting for. It is why tyrants always fall."};
     //500+ Character qoutes
     String[] longQoutes = {
-    "“Why… does it matter?” “Because I think you have a chance to come back from this.  Not much of a chance.  Part of that rides on me.  I could help you, or I could stop you from troubling anyone ever again.  Part of that?  It’s up to you to win the fight, to take control and keep the administrator from claiming everything you have, leaving you a shell.” I felt a chill.  Was part of it my passenger?  Both of us? I opened my mouth to reply, and I couldn’t. Didn’t deserve to, either way. “It’s okay.  I got the answer, myself.” I looked away. I looked up.  My eyes were wet. So many stars.  The universe so vast. We’re s- so very small, in the end.  The first bullet hit me from behind, where my mask offered no coverage, and I slowly toppled.  The second hit me before I could fall, before there could be any pain. ", 
+    "“Why… does it matter?” “Because I think you have a chance to come back from this. Not much of a chance. Part of that rides on me. I could help you, or I could stop you from troubling anyone ever again. Part of that? It’s up to you to win the fight, to take control and keep the administrator from claiming everything you have, leaving you a shell.” I felt a chill. Was part of it my passenger? Both of us? I opened my mouth to reply, and I couldn’t. Didn’t deserve to, either way. “It’s okay. I got the answer, myself.” I looked away. I looked up. My eyes were wet. So many stars. The universe so vast. We’re s- so very small, in the end. The first bullet hit me from behind, where my mask offered no coverage, and I slowly toppled. The second hit me before I could fall, before there could be any pain. ", 
     "He nodded over the battlefield again. ‘And I say once more – your men are losing. You know why? Because yours have something to live for. They care. Mine fight for pleasure, knowing any life outside of war is denied to them. Their own lives are as meaningless to themselves as they are to me, and that is the gift given by the Butcher’s Nails. Warriors, not soldiers. Warriors with no fear of death, and no caution to guard against it. They don’t protect, they kill. They cast aside all thoughts of their own lives in the hunger to end others’. Remember that, Russ. Remember it well.’", 
     "I never wanted this. I never wanted to unleash my legions. Together, we banished the ignorance of Old Night. But you betrayed me, you betrayed us all. You stole power from the Gods and lied to your sons. Mankind has only one chance to prosper, if you will not seize it, then I WILL. So let it be war, from the skies of Terra to the Galactic Rim. Let the seas boil, let the stars fall. Though it takes the last drop of my blood, I will see the galaxy freed once more. And if I cannot save it from your failure, Father, then let the galaxy BURN!", 
     "He remembered being blinded by his father's light. He remembered refusing to abandon his brothers and sisters, beneath a blue sky at high-sun, far from the city of Desh'ea. He remembered the mechanical thunder of absolute betrayal, when he was stolen from the death he'd so richly earned. He remembered the cold moment of truth as he stood in the dark, his hurting eyes healing, that every day he breathed was an unwanted gift. He was walking another man's destiny now. His destiny was to be with the men and women who needed him, who called for him, who followed him into the mountains, and died without him. A destiny denied. He was Angron of Desh'ea. After that, nothing mattered. He'd listened to the others that begged him, that needed it all to matter. He'd played their games, living another man's life. He'd led his fleets, he'd embraced his sons, he'd told himself that blood was thicker than water, and that the Eaters of Worlds were the army he wanted and the horde he deserved. He'd sustained himself on lies, letting none see how he starved. And he served in his cold-hearted father's empire, enduring the silent sneers of brothers he despised.", 

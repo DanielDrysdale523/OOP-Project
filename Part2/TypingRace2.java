@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
 public class TypingRace2
 {
     private int passageLength;   // Total characters in the passage to type
-    private Typist2[] TypistArray;
+    public Typist2[] TypistArray;
 
     // Accuracy thresholds for mistype and burnout events
     // (Ty tuned these values "by feel". They may need adjustment.)
@@ -26,6 +26,9 @@ public class TypingRace2
     public int slideBackModifier = 0;
     public int burnoutModifier = 0;
     public Double accuracyModifier = 0.0;
+
+    public int turnCounter = 0;
+
 
     /**
      * Constructor for objects of class TypingRace.
@@ -81,14 +84,14 @@ public class TypingRace2
                 didPassArray[i] = advanceTypist(TypistArray[i]);
             }
 
-            // Print the current state of the race
-
+            turnCounter++;
             // Check if any typist has finished the passage
             for(int i = 0; i < TypistArray.length; i++){
                  if ( raceFinishedBy(TypistArray[i])){
                      return true;
                  }
             }
+            
             return false;
     }
 
@@ -392,6 +395,10 @@ public class TypingRace2
 
     public void setRaceLength(int length){
         passageLength = length;
+    }
+    public int getRaceLength(){
+        return passageLength;
+
     }
     public TypingRace2() {
     }

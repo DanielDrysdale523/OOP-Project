@@ -1,7 +1,9 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import javax.sound.sampled.spi.FormatConversionProvider;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -412,7 +414,7 @@ class setupGUI{
                 midRace.midRaceGuiSetup(f, typistDataArray, slide.getValue(), (String) globalmodifiersSelection.getSelectedItem(), (String) passageLengthSecelction.getSelectedItem());
                 
                 
-                Thread backgroundRun = new Thread(new TypingRacer(typistDataArray, slide.getValue(), (String) globalmodifiersSelection.getSelectedItem(), midRace.passage, midRace.qouteOutput));
+                Thread backgroundRun = new Thread(new TypingRacer(f, typistDataArray, slide.getValue(), (String) globalmodifiersSelection.getSelectedItem(), midRace.passage, midRace.qouteOutput));
                 backgroundRun.start();
 
 
@@ -459,7 +461,7 @@ class setupGUI{
         if(typingStyle.equals("Hunt and Peck")){
             //low slideback risk, but high burnout risk and less accuracy.
             //Shorter burnouts
-            tempaccuracyTimes100 = 40;
+            tempaccuracyTimes100 = 60;
             tempSlideBackAmount = 5;
             tempslideBackChanceTimes100 = 10;
             tempBurnoutAmount = 3;
@@ -468,7 +470,7 @@ class setupGUI{
         else if(typingStyle.equals("Touch Typing")){
             //Generally balacnced, with a slightly higher burnout risk and slightly lower slide back risk.
             //High accuracy
-            tempaccuracyTimes100 = 60;
+            tempaccuracyTimes100 = 80;
             tempSlideBackAmount = 4;
             tempslideBackChanceTimes100 = 12;
             tempBurnoutAmount = 5;
@@ -477,7 +479,7 @@ class setupGUI{
         else if(typingStyle.equals("Phone Thumbs")){
             //Low burnout stats, but high slide back frequency.
             //average accuracy
-            tempaccuracyTimes100 = 50;
+            tempaccuracyTimes100 = 70;
             tempSlideBackAmount = 5;
             tempslideBackChanceTimes100 = 25;
             tempBurnoutAmount = 3;
@@ -486,7 +488,7 @@ class setupGUI{
         else if(typingStyle.equals("Voice to Text")){
             //LOW slide back, but  high burnout risk and recovery time.
             //average accuracy
-            tempaccuracyTimes100 = 50;
+            tempaccuracyTimes100 = 70;
             tempSlideBackAmount = 3;
             tempslideBackChanceTimes100 = 10;
             tempBurnoutAmount = 6;
@@ -580,13 +582,16 @@ class TypingRacer implements Runnable {
     int typistCount;
     String globalModifier;
     JPanel outputLabel;
+    JFrame frame;
    
-    TypingRacer(Typist2[] typistDataArray, int typistCount, String globalModifier, String inputPassage, JPanel outputLabel){
+    TypingRacer(JFrame x, Typist2[] typistDataArray, int typistCount, String globalModifier, String inputPassage, JPanel outputLabel){
+        this.frame = x;
         this.typistDataArray = typistDataArray;
         this.typistCount = typistCount;
         this.globalModifier = globalModifier;
         this.passage = inputPassage;
         this.outputLabel = outputLabel;
+        System.out.println("Typing Racer Initialized with " + typistCount + " typists and passage length of " + passage.length() + " characters.");
 
     }
     
@@ -643,8 +648,574 @@ class TypingRacer implements Runnable {
             updateGui.start();
 
         }
+        System.out.println("Race Finished!");
+         try {
+                TimeUnit.MILLISECONDS.sleep(2000);
+            } catch (Exception e) {}
+        Thread FinalGUI = new Thread(new finalGUI(outputLabel, race, frame));
+        FinalGUI.start();
+        
 
     }
+}
+class finalGUI implements Runnable {
+
+        
+
+
+
+    JPanel labelToClear;
+    TypingRace2 race;
+    JFrame frame;
+    finalGUI(JPanel labelToClear, TypingRace2 race, JFrame x){
+        this.labelToClear = labelToClear;
+        this.race = race;
+        this.frame = x;
+    }
+    @Override
+    public void run() {
+
+        
+
+        // goes through, and clears the screen.
+        JPanel[] TypistSummaryArray = new JPanel[6];
+        TypistSummaryArray[0] = new JPanel();
+        TypistSummaryArray[1] = new JPanel();
+        TypistSummaryArray[2] = new JPanel();
+        TypistSummaryArray[3] = new JPanel();
+        TypistSummaryArray[4] = new JPanel();
+        TypistSummaryArray[5] = new JPanel();
+
+
+
+        JLabel[] typistSummaryNames = new JLabel[6];
+        
+        
+        labelToClear.removeAll();
+        labelToClear.revalidate();
+        labelToClear.repaint();
+
+
+        JPanel MainContainer = new JPanel();
+        JPanel summaryContainer = new JPanel();
+        summaryContainer.setLayout(new BoxLayout(summaryContainer, BoxLayout.X_AXIS));
+        MainContainer.setLayout(new BoxLayout(MainContainer, BoxLayout.X_AXIS));
+
+
+        
+
+        Typist2[] competitors = race.TypistArray;
+        //Then sort them based on their position in the race
+        for(int x = 0; x < competitors.length - 1; x++){
+            for(int y = 0; y < competitors.length - x - 1; y++){
+                if(competitors[y].getProgress() < competitors[y + 1].getProgress()){
+                    Typist2 temp = competitors[y];
+                    competitors[y] = competitors[y + 1];
+                    competitors[y + 1] = temp;
+                }
+            }
+        }
+        //So we have a sorted list, based on who came first
+        int numOFTurns = race.turnCounter;
+        Double timePerTurn = 0.2;
+        Double totalTime = numOFTurns * timePerTurn;
+
+        for (int i = 0; i < competitors.length; i++) {
+            typistSummaryNames[i] = new JLabel("<html>" + competitors[i].getName() + "<br>" + "Accuracy: " + competitors[i].getAccuracy() + "<br>" + "Slide Back Amount: " + competitors[i].getSlideBackAmount() + "<br>" + "Burnout Risk: " + competitors[i].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + competitors[i].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + competitors[i].getSlideBackRisk() + "</html>");
+            TypistSummaryArray[i].add(typistSummaryNames[i]);
+        }
+        
+
+
+
+        JPanel[] finalResults = new JPanel[competitors.length];
+        JLabel[] winnerLabel = new JLabel[competitors.length];
+        for(int i = 0; i < competitors.length; i++){
+            //get stats
+            int Succesfulturns = competitors[i].successfulTypeCounter;
+            int slideBackCount = competitors[i].slideBackCounter;
+
+            Double LPM = (competitors[i].getProgress() / totalTime) * 60.0;
+            LPM = Math.round(LPM * 100.0) / 100.0;
+
+            Double accuracyPercentage = (double) Succesfulturns / (Succesfulturns + slideBackCount) * 100;
+            accuracyPercentage = Math.round(accuracyPercentage * 100.0) / 100.0;
+
+
+            int burnoutCount = competitors[i].burnoutCounter;
+
+
+            Double afterAccuracy = competitors[i].getAccuracy();
+            competitors[i].updateStats();
+            Double beforeAccuracy = competitors[i].getAccuracy();
+
+            Double accuracyModifierFromBurnout = (( afterAccuracy * 100.0) - (beforeAccuracy * 100.0))/100.0;
+            competitors[i].setAccuracy(afterAccuracy);
+
+
+            //Change based on sponser
+            int moneyGained = (int) ((i + 1) * 10 + LPM * 10 - burnoutCount *5) + ((int) (race.getRaceLength()) / 2);
+
+            // CyanCorp 10 coins per slideback
+            if(competitors[i].sponsor.equals("CyanCorp")){
+                moneyGained += (int) (slideBackCount * 10);
+            }
+            //OrangeFast 5 coins per LPM
+            if(competitors[i].sponsor.equals("OrangeFast")){
+                moneyGained += (int)(LPM * 5);
+            }
+            //RedRight 3 coins per accuracy percentage point
+            if(competitors[i].sponsor.equals("RedRight")){
+                moneyGained +=  (int)(accuracyPercentage * 3);
+            }
+            //GreenMaster 50 coins per accuracy lost percentage point
+            if(competitors[i].sponsor.equals("GreenMaster")){
+                moneyGained += (int)(accuracyModifierFromBurnout * -100 * 50);
+            }
+
+            //BlueBoost 75 coins per burnout 
+            if(competitors[i].sponsor.equals("BlueBoost")){
+                moneyGained += (int)(burnoutCount * 75);
+            }
+            //GrayCris coins * 105%
+            if(competitors[i].sponsor.equals("GrayCris")){
+                moneyGained = (int)(moneyGained * 1.05);
+            }
+            //PinkPower doules Coins gained from position.
+            if(competitors[i].sponsor.equals("PinkPower")){
+                moneyGained += (int)((competitors.length - i) * 10);
+            }
+
+
+
+
+
+
+            
+            if(moneyGained < race.getRaceLength()){
+                moneyGained = race.getRaceLength();
+            }
+
+            competitors[i].financialScore += moneyGained;
+
+            //Update the overall score
+            competitors[i].overallScore += competitors.length -i;
+
+            //Need to add titles
+
+            //Speedy - finish in the top half three rounds in a row
+            //Zooming finish in the top half six rounds in a row
+            //Supersonic finish in the top half nine rounds in a row
+            if(i < competitors.length / 2){
+                competitors[i].top3GamesInRowCounter += 1;
+
+            }else{
+                competitors[i].top3GamesInRowCounter = 0;
+            }
+            //Accurate - achieve over 90% accuracy three rounds in a row
+            //Pinpoint - achieve over 90% accuracy six rounds in a row
+            //Impeccable - achieve over 90% accuracy nine rounds in a row
+
+            if(accuracyPercentage > 90){
+                competitors[i].z90PercentAccuracyCounter += 1;
+            }else{
+                competitors[i].z90PercentAccuracyCounter = 0;
+            }
+
+            //Copper Fingers - complete a race without burning out
+            //Iron Fingers - complete three races without burning out
+            //Steel Fingers - complete five races without burning out
+
+            if(burnoutCount == 0){
+                competitors[i].noBurnoutCounter += 1;
+            }else{
+                competitors[i].noBurnoutCounter = 0;
+            }
+            //Now assign the titles based on the counters
+            String competeTitle = "";
+
+
+            if (competitors[i].top3GamesInRowCounter >=9) {
+                competeTitle = "Supersonic";
+                
+            }
+            else if (competitors[i].top3GamesInRowCounter >=6){
+                competeTitle = "Zooming";
+            }else if (competitors[i].top3GamesInRowCounter >=3){
+                competeTitle = "Speedy";
+
+            }
+
+            if (competitors[i].z90PercentAccuracyCounter >=9) {
+                competeTitle += "Impeccable";
+                
+            }
+            else if (competitors[i].z90PercentAccuracyCounter >=6){
+                competeTitle += "Pinpoint";
+            }else if (competitors[i].z90PercentAccuracyCounter >=3){
+                competeTitle += "Accurate";
+
+            }if (competitors[i].noBurnoutCounter >=5) {
+                competeTitle += " Steel Fingered";
+                
+            }
+            else if (competitors[i].noBurnoutCounter >=3){
+                competeTitle += " Iron Fingered";
+            }else if (competitors[i].noBurnoutCounter >=1){
+                competeTitle += " Copper Fingered";
+
+            }
+            if(competeTitle.equals("")){
+                competitors[i].title = (competeTitle + " Typist ");
+            }
+
+            
+
+
+
+
+            typistHistory[] history = new typistHistory[competitors[i].history.length + 1];
+            for(int x = 0; x < competitors[i].history.length; x++){
+                history[x] = competitors[i].history[x];
+            }
+            history[history.length - 1] = new typistHistory(competitors[i].getName(), LPM, accuracyPercentage, slideBackCount, burnoutCount, i + 1);
+            competitors[i].history = history;
+
+           
+
+
+
+            finalResults[i] = new JPanel();
+            winnerLabel[i] = new JLabel("<HTML><b>" + (i + 1) + ": " + competitors[i].getName() + "</b><br>" + competitors[i].title + "<br>" + "Sponser: " + competitors[i].sponsor + "<br>" + "LPM: " + LPM + "<br>" + "Achieved Accuracy: " + accuracyPercentage + "%<br>" + "Burnout Count: " + burnoutCount + "<br>" + "Base Accuracy Change: " + accuracyModifierFromBurnout + "<br>" + "Total Earnings: " + competitors[i].financialScore + "<br>" + "Overall Score: " + competitors[i].overallScore + "<br>");
+            if(LPM >= competitors[i].personalBest)
+            {
+                competitors[i].personalBest = LPM;
+                winnerLabel[i].setText(winnerLabel[i].getText() + "<br><b>New Personal Best!</b>"  + "</HTML>") ;
+
+            }else{
+                winnerLabel[i].setText(winnerLabel[i].getText() + "</HTML>") ;
+            }
+            winnerLabel[i].setFont(new Font("Serif", Font.BOLD, 16));
+            finalResults[i].add(winnerLabel[i]);
+            summaryContainer.add(TypistSummaryArray[i]);
+
+            //Now Add buttons to view history, Accept a sponser and to spend gained money.
+
+            //100 for +0.1 acuracy.
+            //250 for -1 burnout time
+            //300 for -1 slideback distance
+            //500 for a random sponser 
+            JButton viewHistoryButton = new JButton("View History");
+            final int x = i;
+            final Double finalLPM = LPM;
+            final Double finalaccuracyPercentageq = accuracyPercentage;
+            
+            viewHistoryButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    openHistory(competitors[x]);
+                }
+            });
+            JButton spendMoneyButton = new JButton("Boost Accuracy (500)");
+
+             spendMoneyButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    if(competitors[x].financialScore >= 500){
+                        competitors[x].setAccuracy((competitors[x].getAccuracy() * 100 + 1) / 100);
+                        competitors[x].financialScore -= 500;
+
+                        //Update the accuracy in the GUI
+                        winnerLabel[x].setText("<HTML><b>" + (x + 1) + ": " + competitors[x].getName() + "</b><br>" + competitors[x].title + "<br>" + "Sponser: " + competitors[x].sponsor + "<br>" + "LPM: " + finalLPM + "<br>" + "Achieved Accuracy: " + finalaccuracyPercentageq + "%<br>" + "Burnout Count: " + burnoutCount + "<br>" + "Base Accuracy Change: " + accuracyModifierFromBurnout + "<br>" + "Total Earnings: " + competitors[x].financialScore + "<br>" + "Overall Score: " + competitors[x].overallScore + "<br>");
+                        if(finalLPM >= competitors[x].personalBest){
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "<br><b>New Personal Best!</b>"  + "</HTML>") ;
+                        }
+                        else{
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "</HTML>") ;
+                        }
+                        typistSummaryNames[x].setText("<html>" + competitors[x].getName() + "<br>" + "Accuracy: " + competitors[x].getAccuracy() + "<br>" + "Slide Back Amount: " + competitors[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + competitors[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + competitors[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + competitors[x].getSlideBackRisk() + "</html>");
+
+
+                    }
+                }
+            });
+
+            JButton reduceBurnoutTimeButton = new JButton("Shorter Burnouts (500)");
+
+            reduceBurnoutTimeButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    if(competitors[x].financialScore >= 500 && competitors[x].getBurnoutRecoveryTime() > 1){
+                        competitors[x].financialScore -= 500;
+
+                        competitors[x].setBurnoutRecoveryTime(competitors[x].getBurnoutRecoveryTime() - 1);
+
+
+                        //Update the accuracy in the GUI
+                        winnerLabel[x].setText("<HTML><b>" + (x + 1) + ": " + competitors[x].getName() + "</b><br>" + competitors[x].title + "<br>" + "Sponser: " + competitors[x].sponsor + "<br>" + "LPM: " + finalLPM + "<br>" + "Achieved Accuracy: " + finalaccuracyPercentageq + "%<br>" + "Burnout Count: " + burnoutCount + "<br>" + "Base Accuracy Change: " + accuracyModifierFromBurnout + "<br>" + "Total Earnings: " + competitors[x].financialScore + "<br>" + "Overall Score: " + competitors[x].overallScore + "<br>");
+                        if(finalLPM >= competitors[x].personalBest){
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "<br><b>New Personal Best!</b>"  + "</HTML>") ;
+
+                        }
+                        else{
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "</HTML>") ;
+                        }
+                        typistSummaryNames[x].setText("<html>" + competitors[x].getName() + "<br>" + "Accuracy: " + competitors[x].getAccuracy() + "<br>" + "Slide Back Amount: " + competitors[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + competitors[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + competitors[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + competitors[x].getSlideBackRisk() + "</html>");
+
+
+                    }                
+                }
+            });
+
+            JButton reduceSlideBackButton = new JButton("Shorter SlideBack (600)");
+
+            reduceSlideBackButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    if(competitors[x].financialScore >= 600 && competitors[x].getSlideBackAmount() > 1){
+                        competitors[x].financialScore -= 600;
+                        competitors[x].setSlideBackAmount(competitors[x].getSlideBackAmount() - 1);
+                        
+
+                        //Update the accuracy in the GUI
+                        winnerLabel[x].setText("<HTML><b>" + (x + 1) + ": " + competitors[x].getName() + "</b><br>" + competitors[x].title + "<br>" + "Sponser: " + competitors[x].sponsor + "<br>" + "LPM: " + finalLPM + "<br>" + "Achieved Accuracy: " + finalaccuracyPercentageq + "%<br>" + "Burnout Count: " + burnoutCount + "<br>" + "Base Accuracy Change: " + accuracyModifierFromBurnout + "<br>" + "Total Earnings: " + competitors[x].financialScore + "<br>" + "Overall Score: " + competitors[x].overallScore + "<br>");
+                        if(finalLPM >= competitors[x].personalBest){
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "<br><b>New Personal Best!</b>"  + "</HTML>") ;
+
+                        }
+                        else{
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "</HTML>") ;
+                        }
+                        typistSummaryNames[x].setText("<html>" + competitors[x].getName() + "<br>" + "Accuracy: " + competitors[x].getAccuracy() + "<br>" + "Slide Back Amount: " + competitors[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + competitors[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + competitors[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + competitors[x].getSlideBackRisk() + "</html>");
+
+
+                    }
+                }
+            });
+
+            JButton randomSponserButton = new JButton("Random Sponser (850)");
+
+             randomSponserButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent evt) {
+                    if(competitors[x].financialScore >= 850 && competitors[x].sponsor.equals("None")){
+                        competitors[x].financialScore -= 850;
+                        //Grab random Sponser
+                        String[] sponserArray = {"CyanCorp", "OrangeFast", "RedRight", "GreenMaster", "BlueBoost", "GrayCris", "PinkPower"};
+                        int randomIndex = (int) (Math.random() * sponserArray.length);
+                        competitors[x].sponsor = sponserArray[randomIndex];
+
+
+                        //Update the accuracy in the GUI
+                        winnerLabel[x].setText("<HTML><b>" + (x + 1) + ": " + competitors[x].getName() + "</b><br>" + competitors[x].title + "<br>" + "Sponser: " + competitors[x].sponsor + "<br>" + "LPM: " + finalLPM + "<br>" + "Achieved Accuracy: " + finalaccuracyPercentageq + "%<br>" + "Burnout Count: " + burnoutCount + "<br>" + "Base Accuracy Change: " + accuracyModifierFromBurnout + "<br>" + "Total Earnings: " + competitors[x].financialScore + "<br>" + "Overall Score: " + competitors[x].overallScore + "<br>");
+                        if(finalLPM >= competitors[x].personalBest){
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "<br><b>New Personal Best!</b>"  + "</HTML>") ;
+
+                        }
+                        else{
+                            winnerLabel[x].setText(winnerLabel[x].getText() + "</HTML>") ;
+                        }
+                        typistSummaryNames[x].setText("<html>" + competitors[x].getName() + "<br>" + "Accuracy: " + competitors[x].getAccuracy() + "<br>" + "Slide Back Amount: " + competitors[x].getSlideBackAmount() + "<br>" + "Burnout Risk: " + competitors[x].getBurnoutRisk() + "<br>" + "Burnout Recovery Time: " + competitors[x].getBurnoutRecoveryTime() + "<br>" + "Slide Back Risk: " + competitors[x].getSlideBackRisk() + "</html>");
+
+
+                    }
+                }
+            });
+
+            finalResults[i].add(viewHistoryButton);
+            finalResults[i].add(spendMoneyButton);
+            finalResults[i].add(reduceBurnoutTimeButton);
+            finalResults[i].add(reduceSlideBackButton);
+            finalResults[i].add(randomSponserButton);
+
+
+            finalResults[i].setPreferredSize(new Dimension(200, 450));
+
+            MainContainer.add(finalResults[i]);
+
+        }
+
+
+        //allows for different leaderboards to be viewed - overall score, and financial score.
+        MainContainer.setPreferredSize(new Dimension(1200, 450));
+        JPanel leaderboard = new JPanel();
+        summaryContainer.setPreferredSize(new Dimension(1200, 100));
+        leaderboard.setPreferredSize(new Dimension(1200, 200));
+        frame.add(summaryContainer);
+        frame.add(leaderboard);
+
+        Typist2[] overallSorted = competitors.clone();
+        for(int x = 0; x < overallSorted.length - 1; x++){
+            for(int y = 0; y < overallSorted.length - x - 1; y++){
+                if(overallSorted[y].overallScore < overallSorted[y + 1].overallScore){
+                    Typist2 temp = overallSorted[y];
+                    overallSorted[y] = overallSorted[y + 1];
+                    overallSorted[y + 1] = temp;
+                }
+            }
+        }
+        String overallString = "<HTML><b>Overall Leaderboard:</b><br>";
+        for(int i = 0; i < overallSorted.length; i++){
+            overallString += (i + 1) + ": " + overallSorted[i].getName() + " - " + overallSorted[i].overallScore + "<br>"; 
+        }
+        overallString += "</HTML>";
+        JLabel overallLabel = new JLabel(overallString);
+        overallLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        leaderboard.add(overallLabel);
+
+        Typist2[] moneySorted = competitors.clone();
+        for(int x = 0; x < moneySorted.length - 1; x++){
+            for(int y = 0; y < moneySorted.length - x - 1; y++){
+                if(moneySorted[y].financialScore < moneySorted[y + 1].financialScore){
+                    Typist2 temp = moneySorted[y];
+                    moneySorted[y] = moneySorted[y + 1];
+                    moneySorted[y + 1] = temp;
+                }
+            }
+        }
+        String moneyString = "<HTML><b>Financial Leaderboard:</b><br>";
+        for(int i = 0; i < moneySorted.length; i++){
+            moneyString += (i + 1) + ": " + moneySorted[i].getName() + " - " + moneySorted[i].financialScore + "<br>"; 
+        }
+        moneyString += "</HTML>";
+        JLabel moneyLabel = new JLabel(moneyString);
+        moneyLabel.setFont(new Font("Serif", Font.BOLD, 16));
+        leaderboard.add(moneyLabel);
+
+
+        
+
+       
+
+        labelToClear.add(MainContainer);
+        JComboBox<String> globalmodifiersSelection = new JComboBox<>(new String[] {"No  Modifiers", "Autocorrect On", "Caffine Mode", "Night Shift", "All Modifiers"});
+        JComboBox<String> passageLengthSecelction = new JComboBox<>(new String[] {"Short Passage", "Medium Passage", "Long Passage", "Random Length Passage"});
+
+        JPanel globalModifiersSelect = new JPanel();
+
+
+        globalModifiersSelect.add(new JLabel("Global Modifiers:"));
+        globalModifiersSelect.add(globalmodifiersSelection);
+
+        JPanel passageLenSelect = new JPanel();
+
+        passageLenSelect.add(new JLabel("Passage Length:"));
+        passageLenSelect.add(passageLengthSecelction);
+
+
+        JButton playAgainButton = new JButton("Play Again");
+        playAgainButton.setPreferredSize(new Dimension(200, 50));
+        playAgainButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                //Call a function to reset the game here
+                frame.remove(globalModifiersSelect);
+                frame.remove(passageLenSelect);
+                frame.remove(playAgainButton);
+                frame.remove(labelToClear);
+                frame.remove(leaderboard);
+                frame.remove(summaryContainer);
+                
+                frame.revalidate();
+                frame.repaint();
+                if(competitors[0].getAccuracy() > 0.9){
+                    competitors[0].setAccuracy((competitors[0].getAccuracy() * 100 - 3) / 100);
+
+                }
+
+                for(int i = 0; i < competitors.length; i++){
+                    competitors[i].resetToStart();
+                }
+
+                System.out.println("Play Again Clicked!");
+
+                midRaceGui midRace = new midRaceGui();
+                midRace.midRaceGuiSetup(frame, competitors, competitors.length, (String) globalmodifiersSelection.getSelectedItem(), (String) passageLengthSecelction.getSelectedItem());
+                
+                
+                Thread backgroundRun = new Thread(new TypingRacer(frame, competitors, competitors.length, (String) globalmodifiersSelection.getSelectedItem(), (String) midRace.passage ,  midRace.qouteOutput));
+                backgroundRun.start();
+                return;
+
+            }
+
+        });
+
+
+        frame.add(globalModifiersSelect);
+        frame.add(passageLenSelect);
+        frame.add(playAgainButton);
+
+
+        labelToClear.revalidate();
+        labelToClear.repaint();
+
+
+
+
+
+
+        return;
+        
+    }
+    int count = 0;
+    public void openHistory(Typist2 typist){
+        //This is where we will make a pop up with the history of the typist - this is called when the user clicks the "View History" button on a typist summary.
+        //Pull up a new window for it
+        JFrame history = new JFrame();
+        history.setLayout(new FlowLayout());
+        history.setTitle("History of " + typist.getName());
+
+        //So now, I get the data from the typist, and display it in a nice way on the window.
+
+        String historyString = "<HTML><b>History of " + typist.getName() + ":</b><br><br>";
+        count = typist.history.length - 1;
+        JButton nextButton = new JButton("Next");
+        JButton prevButton = new JButton("Previous");
+
+        history.add(prevButton);
+        history.add(nextButton);
+
+        historyString = "<HTML><b>History of " + typist.getName() + ":</b><br>" + "Race " + (count + 1) + ": " + "LPM: " + typist.history[count].LPM + ", Accuracy: " + typist.history[count].accuracy + ", Slide Backs: " + typist.history[count].slideBacks + ", Burnouts: " + typist.history[count].burnouts + ", Position: " + typist.history[count].positionFinished + "<br></HTML>";
+        JLabel historyLabel = new JLabel(historyString);
+        history.add(historyLabel);
+
+
+        nextButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                changeCount(count + 1);
+
+                String  historyString2 = "<HTML><b>History of " + typist.getName() + ":</b><br>" + "Race " + (count + 1) + ": " + "LPM: " + typist.history[count].LPM + ", Accuracy: " + typist.history[count].accuracy + ", Slide Backs: " + typist.history[count].slideBacks + ", Burnouts: " + typist.history[count].burnouts + ", Position: " + typist.history[count].positionFinished + "<br></HTML>";
+                historyLabel.setText(historyString2);
+
+
+            }
+        });
+        prevButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent evt) {
+                changeCount(count - 1);
+                //So now, I get the data from the typist, and display it in a nice way on the window.
+                String  historyString2 = "<HTML><b>History of " + typist.getName() + ":</b><br>" + "Race " + (count + 1) + ": " + "LPM: " + typist.history[count].LPM + ", Accuracy: " + typist.history[count].accuracy + ", Slide Backs: " + typist.history[count].slideBacks + ", Burnouts: " + typist.history[count].burnouts + ", Position: " + typist.history[count].positionFinished + "<br></HTML>";
+                historyLabel.setText(historyString2);
+                
+            }
+        });
+                
+    
+
+        
+        
+
+        history.setSize(600, 200);
+        history.setVisible(true);
+
+    }
+    public void changeCount(Integer x){
+        count = x;
+    }
+    
 }
 class guiUpdater implements Runnable {
     String newText;
@@ -662,6 +1233,8 @@ class guiUpdater implements Runnable {
         x.setPreferredSize(new Dimension(1200, 800));
         x.setHorizontalAlignment(SwingConstants.CENTER);
         x.setVerticalAlignment(SwingConstants.CENTER);
+
+        
 
         labelToUpdate.add(x);
         labelToUpdate.revalidate();
@@ -686,8 +1259,7 @@ class midRaceGui{
     "“Why… does it matter?” “Because I think you have a chance to come back from this. Not much of a chance. Part of that rides on me. I could help you, or I could stop you from troubling anyone ever again. Part of that? It’s up to you to win the fight, to take control and keep the administrator from claiming everything you have, leaving you a shell.” I felt a chill. Was part of it my passenger? Both of us? I opened my mouth to reply, and I couldn’t. Didn’t deserve to, either way. “It’s okay. I got the answer, myself.” I looked away. I looked up. My eyes were wet. So many stars. The universe so vast. We’re s- so very small, in the end. The first bullet hit me from behind, where my mask offered no coverage, and I slowly toppled. The second hit me before I could fall, before there could be any pain. ", 
     "He nodded over the battlefield again. ‘And I say once more – your men are losing. You know why? Because yours have something to live for. They care. Mine fight for pleasure, knowing any life outside of war is denied to them. Their own lives are as meaningless to themselves as they are to me, and that is the gift given by the Butcher’s Nails. Warriors, not soldiers. Warriors with no fear of death, and no caution to guard against it. They don’t protect, they kill. They cast aside all thoughts of their own lives in the hunger to end others’. Remember that, Russ. Remember it well.’", 
     "I never wanted this. I never wanted to unleash my legions. Together, we banished the ignorance of Old Night. But you betrayed me, you betrayed us all. You stole power from the Gods and lied to your sons. Mankind has only one chance to prosper, if you will not seize it, then I WILL. So let it be war, from the skies of Terra to the Galactic Rim. Let the seas boil, let the stars fall. Though it takes the last drop of my blood, I will see the galaxy freed once more. And if I cannot save it from your failure, Father, then let the galaxy BURN!", 
-    "He remembered being blinded by his father's light. He remembered refusing to abandon his brothers and sisters, beneath a blue sky at high-sun, far from the city of Desh'ea. He remembered the mechanical thunder of absolute betrayal, when he was stolen from the death he'd so richly earned. He remembered the cold moment of truth as he stood in the dark, his hurting eyes healing, that every day he breathed was an unwanted gift. He was walking another man's destiny now. His destiny was to be with the men and women who needed him, who called for him, who followed him into the mountains, and died without him. A destiny denied. He was Angron of Desh'ea. After that, nothing mattered. He'd listened to the others that begged him, that needed it all to matter. He'd played their games, living another man's life. He'd led his fleets, he'd embraced his sons, he'd told himself that blood was thicker than water, and that the Eaters of Worlds were the army he wanted and the horde he deserved. He'd sustained himself on lies, letting none see how he starved. And he served in his cold-hearted father's empire, enduring the silent sneers of brothers he despised.", 
-    "‘Be silent! You have given your threats, dog. Now hear me. Listen to another hound barking, for once.’ ‘Then speak,’ Russ had said, as if permission were his to give. ‘I am loyal, the same as you. I am told to bathe my Legion in the blood of innocents and sinners alike, and I do it, because it is all that’s left for me in this life. I do these things, and I enjoy them, not because we are moral, or right – or loving souls seeking to enlighten a dark universe – but because all I feel are the Butcher’s Nails hammered into my brain. I serve because of this “mutilation”. Without it? Well, perhaps I might be a more moral man, like you claim to be. A virtuous man, eh? Perhaps I might ascend the steps of our father’s palace and take the slaving bastard’s head.’ Both Legions tensed. Thousands and thousands of warriors clutched bolters and chainweapons tighter. Lhorke had even taken a step back, his joints loud in the sudden silence. Russ felt no such hesitation. He drew his blade and launched at Angron, only to be met with the World Eater’s axe blocking the blow. The brothers breathed hatred into each other’s faces. ‘You are lost,’ Russ growled. ‘You gelded, black-hearted heretic.’ ‘I am merely honest, brother. In all but this you are no different from me.’ ‘If you cannot see the chasm between savagery and ferocity, then you are hopelessly gone, Angron.’ The World Eater threw Russ back, sending the Wolf King staggering. ‘Then I am gone. But we both know the day will never dawn that you can best me in combat.’"};
+    "He remembered being blinded by his father's light. He remembered refusing to abandon his brothers and sisters, beneath a blue sky at high-sun, far from the city of Desh'ea. He remembered the mechanical thunder of absolute betrayal, when he was stolen from the death he'd so richly earned. He remembered the cold moment of truth as he stood in the dark, his hurting eyes healing, that every day he breathed was an unwanted gift. He was walking another man's destiny now. His destiny was to be with the men and women who needed him, who called for him, who followed him into the mountains, and died without him. A destiny denied. He was Angron of Desh'ea. After that, nothing mattered. He'd listened to the others that begged him, that needed it all to matter. He'd played their games, living another man's life. He'd led his fleets, he'd embraced his sons, he'd told himself that blood was thicker than water, and that the Eaters of Worlds were the army he wanted and the horde he deserved. He'd sustained himself on lies, letting none see how he starved. And he served in his cold-hearted father's empire, enduring the silent sneers of brothers he despised."};
     //100-500 character qoutes
     String[] midQoutes = {
     "“More assault and battery,” I said, feeling a touch weary. “Whatever charges come up with the thing at the school. I sort of arranged to have a psychopath kill herself. Um. However you’d charge putting maggots in someone’s eyeballs. In self-defense.”",
@@ -743,6 +1315,8 @@ class midRaceGui{
         f.repaint();
         f.setVisible(true);
         
+
+        System.out.println("Rendered Race GUI with passage: " + passage);
 
         
 

@@ -30,6 +30,20 @@ public class Typist2 extends Typist
     final private int baseBurnoutRecoveryTime = 4;
     final private double baseSlideBackRisk = 0.15;
 
+    public int overallScore = 0;
+    public int financialScore = 0;
+
+    public int top3GamesInRowCounter = 0;
+    public int z90PercentAccuracyCounter = 0;
+    public int noBurnoutCounter = 0;
+
+    public String title = "";
+
+    public String sponsor = "None";
+
+    public typistHistory[] history = new typistHistory[0];
+
+
      // Constructor of class Typist
     /**
      * Constructor for objects of class Typist.
@@ -195,7 +209,7 @@ public class Typist2 extends Typist
         if(typingStyle.equals("Hunt and Peck")){
             //low slideback risk, but high burnout risk and less accuracy.
             //Shorter burnouts
-            tempaccuracyTimes100 = 40;
+            tempaccuracyTimes100 = 60;
             tempSlideBackAmount = 5;
             tempslideBackChanceTimes100 = 10;
             tempBurnoutAmount = 3;
@@ -204,7 +218,7 @@ public class Typist2 extends Typist
         else if(typingStyle.equals("Touch Typing")){
             //Generally balacnced, with a slightly higher burnout risk and slightly lower slide back risk.
             //High accuracy
-            tempaccuracyTimes100 = 60;
+            tempaccuracyTimes100 = 80;
             tempSlideBackAmount = 4;
             tempslideBackChanceTimes100 = 12;
             tempBurnoutAmount = 5;
@@ -213,7 +227,7 @@ public class Typist2 extends Typist
         else if(typingStyle.equals("Phone Thumbs")){
             //Low burnout stats, but high slide back frequency.
             //average accuracy
-            tempaccuracyTimes100 = 50;
+            tempaccuracyTimes100 = 70;
             tempSlideBackAmount = 5;
             tempslideBackChanceTimes100 = 25;
             tempBurnoutAmount = 3;
@@ -222,7 +236,7 @@ public class Typist2 extends Typist
         else if(typingStyle.equals("Voice to Text")){
             //LOW slide back, but  high burnout risk and recovery time.
             //average accuracy
-            tempaccuracyTimes100 = 50;
+            tempaccuracyTimes100 = 70;
             tempSlideBackAmount = 3;
             tempslideBackChanceTimes100 = 10;
             tempBurnoutAmount = 6;
@@ -288,6 +302,21 @@ public class Typist2 extends Typist
         slideBackRisk = (tempslideBackChanceTimes100/100.0);
         burnoutRecoveryTime = tempBurnoutAmount;
         burnoutRisk = (tempBurnoutTimes1000/10000.0); 
+    }
+
+    public void setSlideBackAmount(int amount){
+        if (amount <= 1) {
+            slideBackAmount = 1;
+        } else {
+            slideBackAmount = amount;
+        }
+    }
+    public void setBurnoutRecoveryTime(int amount){
+        if (amount <= 1) {
+            burnoutRecoveryTime = 1;
+        } else {
+            burnoutRecoveryTime = amount;
+        }
     }
 
 }

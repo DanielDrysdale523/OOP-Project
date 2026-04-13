@@ -27,6 +27,8 @@ public class Typist
     public int successfulTypeCounter = 0;
     public int burnoutCounter = 0;
 
+    public Double personalBest = 0.0;
+
 
 
 
@@ -233,6 +235,21 @@ public class Typist
 
     public void setName(String name){
         this.name = name;
+    }
+
+    public void setSlideBackAmount(int amount){
+        if (amount <= 1) {
+            slideBackCounter = 1;
+        } else {
+            slideBackCounter = amount;
+        }
+    }
+    public void setBurnoutRecoveryTime(int amount){
+        if (amount <= 1) {
+            burnOutTurnsLeft = 1;
+        } else {
+            burnOutTurnsLeft = amount;
+        }
     }
 
 }

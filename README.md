@@ -19,6 +19,28 @@ cd Part1
 javac Typist.java TypingRace.java
 ```
 ### To run the program:
+
+The race is started by calling `startRace()` on a `TypingRace` object.
+A simple way to test this is to add a `main` method to `TypingRace`, for example:
+
+```java
+public static void main(String[] args) {
+    TypingRace race = new TypingRace(40);
+    race.addTypist(new Typist('①', "TURBOFINGERS", 0.85), 1);
+    race.addTypist(new Typist('②', "QWERTY_QUEEN",  0.60), 2);
+    race.addTypist(new Typist('③', "HUNT_N_PECK",   0.30), 3);
+    race.startRace();
+}
+```
+
+Then run:
+
+```bash
+java TypingRace
+```
+
+For convinience however, I have already written a main method for the function, as such, one only need call
+
 ```bash
 java TypingRace.java
 ```
@@ -34,8 +56,9 @@ For each line, the single character represents their symbol for display, the per
 
 ## Part 2 — GUI Simulation
 
-The graphical version is started by calling `startRaceGUI()`.
-This function is found in the raceGUI class.
+The graphical version is started by calling `startRaceGUI()` on a 'raceGUI' object.
+
+You can also start it via the main() method of a 'raceGUI' object.
 
 ### How to compile
 

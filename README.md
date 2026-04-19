@@ -34,15 +34,24 @@ For each line, the single character represents their symbol for display, the per
 
 ## Part 2 — GUI Simulation
 
-To be implemented as part of the coursework. Place all GUI-related source files in this folder. The graphical version is started by calling `startRaceGUI()`.
+The graphical version is started by calling `startRaceGUI()`.
+This function is found in the raceGUI class.
+
+### How to compile
+
+```bash
+cd Part2
+javac Typist.java TypingRace2.java Typist2.java raceGUI.java typistHistory.java
+```
+### To run the program:
+```bash
+java raceGUI.java
+
+
 
 ## Dependencies
 
 - Java Development Kit (JDK) 11 or higher
 - No external libraries required for Part 1
-- Part 2 may use Java Swing (included in standard JDK) or JavaFX
-
-## Notes
-
-- All code should compile and run using standard command-line tools without any IDE-specific configuration.
-- The starter code in Part1 was originally written by Ty Posaurus. It contains known issues — finding and fixing them is part of the coursework.
+- Java Swing is required
+- All other imports are under java.x or javax.swing.x

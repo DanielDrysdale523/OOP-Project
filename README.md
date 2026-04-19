@@ -46,6 +46,7 @@ javac Typist.java TypingRace2.java Typist2.java raceGUI.java typistHistory.java
 ### To run the program:
 ```bash
 java raceGUI.java
+```
 
 
 

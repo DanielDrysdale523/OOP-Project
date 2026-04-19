@@ -3,7 +3,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import javax.sound.sampled.spi.FormatConversionProvider;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -22,6 +21,11 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+/**
+ * Creates a GUI that allows for all options to be selected
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class setupGUI{
     //to setup we need to select
     //Race lengt
@@ -30,12 +34,22 @@ class setupGUI{
     //Difficulty modifiers
     //Start Button
 
-    //Version number 0.3 - 10/04/2026 - 11:25AM
+    //Version number 1 
     //Authour DANIEL DRYSDALE
     int lastNum;
 
 
-   
+   /**
+    * Upon the creation of a setupGUI object, create a frame and a set of controls to 
+    * - select number of typists
+    * - Customise Typists
+    * - Show typist stats
+    * - Show detailed breakdown of typist stats
+    * - Select Passage Length
+    * - Select Race Modifiers
+    * - Start race
+    * 
+    */
     setupGUI(){
         JFrame f = new JFrame();
         f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -434,11 +448,18 @@ class setupGUI{
 
         f.setVisible(true);
     }
+    /**
+     * Change lastnum 
+     * @param x      The value to turn lastNum into
+     */
     public void updateLast(int x){
 
             lastNum = x;
     }
-
+    /**
+     * Makes a new window with a detailed breakdown of the typists statistics
+     * @param typist    The typist to show a detailed breakdown for
+     */
     public void detailedBreakdown(Typist2 typist){
         //This is where we will make a pop up with the detailed breakdown of the stats - this is called when the user clicks the "Show Detailed Breakdown" button on a typist summary.
         //Pull up a new window for it
@@ -575,6 +596,11 @@ class setupGUI{
     }
 
 }
+/**
+ * Runs a single typingRace
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class TypingRacer implements Runnable {
     String passage = "";
 
@@ -583,7 +609,17 @@ class TypingRacer implements Runnable {
     String globalModifier;
     JPanel outputLabel;
     JFrame frame;
-   
+    /**
+     * Constructor for objects of class finalGUI.
+     * Creates a new guiUpdater with a given labelto update and text.
+     *
+     * @param x     The frame in use
+     * @param typistDataArray    the array of participating typists
+     * @param typistCount     The number of typists in use
+     * @param globalModifier  The global modifier in use
+     * @param inputPassage    The passage to type through
+     * @param outputLabel     The JLabel to output the race too
+     */
     TypingRacer(JFrame x, Typist2[] typistDataArray, int typistCount, String globalModifier, String inputPassage, JPanel outputLabel){
         this.frame = x;
         this.typistDataArray = typistDataArray;
@@ -593,7 +629,16 @@ class TypingRacer implements Runnable {
         this.outputLabel = outputLabel;
 
     }
-    
+    /**
+     * prepare an array of Typists for use in a race which it begins
+     *  @param typistDataArray    the array of participating typists
+     * @param typistCount     The number of typists in use
+     * @param globalModifier  The global modifier in use
+     * @param inputPassage    The passage to type through
+     * @param outputLabel     The JLabel to output the race too
+     * 
+     * @return A typingRace that is ready to be played.
+     */
     public TypingRace2 setupRace(Typist2[] typistDataArray, int typistCount, String globalModifier){
         
         //Start the TypingRaceClass
@@ -624,7 +669,9 @@ class TypingRacer implements Runnable {
     }
         
 
-    
+    /**
+     * Run through a race, updating the output label as it goes.
+     */
     @Override
     public void run() {
         // runs through the turns
@@ -636,7 +683,6 @@ class TypingRacer implements Runnable {
                 TimeUnit.MILLISECONDS.sleep(200);
             } catch (Exception e) {}
 
-            //String tempOutput = race.TypingRacePrintString(typistCount, passage);
             String tempOutput = "<HTML>";
             for(int i = 0; i < typistCount; i++){
                 tempOutput += race.TypingRacePrintString(i, passage) + "<br> <br>";
@@ -656,6 +702,11 @@ class TypingRacer implements Runnable {
 
     }
 }
+/**
+ * Displays the resultsscreen, allows for the purchase of upgrades, and for another race to be begun.
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class finalGUI implements Runnable {
 
         
@@ -665,12 +716,28 @@ class finalGUI implements Runnable {
     JPanel labelToClear;
     TypingRace2 race;
     JFrame frame;
+     /**
+     * Constructor for objects of class finalGUI.
+     * Creates a new guiUpdater with a given labelto update and text.
+     *
+     * @param labelToClear  The Panel to be used to display data
+     * @param race    the race that just finished
+     * @param x     The frame that is in use to display within
+     * 
+     */
     finalGUI(JPanel labelToClear, TypingRace2 race, JFrame x){
         this.labelToClear = labelToClear;
         this.race = race;
         this.frame = x;
     }
-    @Override
+    /**
+     * Produce a output screen giving detailed statistics for each typist.
+     * Allows for leaderboard viewing
+     * Adds buttons for displaying typist histor
+     * Calculates funds gained and allows them to be spent.
+     * Updates Titles
+     */
+    @Override 
     public void run() {
 
         
@@ -1162,6 +1229,11 @@ class finalGUI implements Runnable {
         
     }
     int count = 0;
+
+    /**
+     * Creates a new window to display the typists history
+     * @param typist    The typist to display the history of
+     */
     public void openHistory(Typist2 typist){
         //This is where we will make a pop up with the history of the typist - this is called when the user clicks the "View History" button on a typist summary.
         //Pull up a new window for it
@@ -1219,19 +1291,39 @@ class finalGUI implements Runnable {
         history.setVisible(true);
 
     }
+    /**
+     * Updates the count variable
+     * @param x     The value to change count to
+     */
     public void changeCount(Integer x){
         count = x;
     }
     
 }
+/**
+ * Changes the text contained within a Jpanel
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class guiUpdater implements Runnable {
     String newText;
     JPanel labelToUpdate;
+    /**
+     * Constructor for objects of class guiUpdater.
+     * Creates a new guiUpdater with a given labelto update and text.
+     *
+     * @param labelToUpdate  The JLabel to be updated
+     * @param newText    the string to update to
+     */
     guiUpdater(JPanel labelToUpdate, String newText){
         this.labelToUpdate = labelToUpdate;
         this.newText = newText;
     }
-    @Override
+    /**
+     * Removes all objects attached to the label to update, then creates a JLabel containing the text to update
+     * Then re-renders the label to update
+     */
+    @Override 
     public void run() {
         // goes through, and replaces the text in the label with the new text.
         labelToUpdate.removeAll();
@@ -1250,7 +1342,11 @@ class guiUpdater implements Runnable {
         
     }
 }
-
+/**
+ * Displays A race. Output Is constantly modified by a TypingRacer instance
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class midRaceGui{
      //Here are some extracts 
     //<100 character qoutes
@@ -1277,7 +1373,14 @@ class midRaceGui{
     "You could just try being yourself, you know.’ The thought was terrifying. I’d spent so long hiding behind masks I was no longer sure there was a genuine Ciaphas underneath them any more, just a quivering little bundle of self-interest.", 
     "From the moment I understood the weakness of my flesh, it disgusted me. I craved the strength and certainty of steel. I aspired to the purity of the Blessed Machine. Your kind cling to your flesh, as if it will not decay and fail you. One day the crude biomass that you call a temple will wither, and you will beg my kind to save you. But I am already saved, for the Machine is immortal"};
     JPanel qouteOutput;
-
+    /**
+     * Clears the frame, randomly generates a new qoute and creates a qoute-output containing that qoute
+     * @param f the frame to change
+     * @param typistDataArray the array of all current typists.
+     * @param  typistCount the numer of typists
+     * @param globalModifier The global modifier selected
+     * @param passageLength The length of passage to be generated
+     */
     public void midRaceGuiSetup(JFrame f, Typist2[] typistDataArray, int typistCount, String globalModifier, String passageLength){
 
         //Setup the GUI with this function
@@ -1330,6 +1433,11 @@ class midRaceGui{
 
         return;
     }
+    
+    /**
+     * Changes the Jlabel in qouteOutput
+     * @param newQoute: the qoute to change the value to.
+     */
     public synchronized void updateQouteOutput(String newQoute){
         qouteOutput.removeAll();
         qouteOutput.add(new JLabel("<html><div style='text-align: center;'>" + newQoute + "</div></html>"));
@@ -1343,11 +1451,16 @@ class midRaceGui{
 
 }
 
-class endRaceGui{
-
-}
+/**
+ * 
+ * @author Daniel Drysdale
+ * @version 1.0 
+ */
 class raceGUI{
     //run with java "C:\Users\danie\Desktop\OOP PROJECT\TypingRaceSimulator\Part2\raceGUI.java"
+    /**
+     * Main method: Creates a new setUpGui object
+     */
     public static void main(String[] args) {
 
         setupGUI x = new setupGUI();
@@ -1355,6 +1468,9 @@ class raceGUI{
 
 
     }
+     /**
+     * Creates a new setUpGui object
+     */
     public void startRaceGUI(){
         setupGUI x = new setupGUI();
     }

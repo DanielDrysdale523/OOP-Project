@@ -1,5 +1,4 @@
 /**
- * Write a description of class Typist here.
  *
  * Provides an object to serve as a racer in the racing game.
  *
@@ -232,24 +231,15 @@ public class Typist
         symbol = newSymbol;
 
     }
-
+    /**
+     * Sets the Name of the typist.
+     *
+     * @param amount; the new
+     */
     public void setName(String name){
         this.name = name;
     }
 
-    public void setSlideBackAmount(int amount){
-        if (amount <= 1) {
-            slideBackCounter = 1;
-        } else {
-            slideBackCounter = amount;
-        }
-    }
-    public void setBurnoutRecoveryTime(int amount){
-        if (amount <= 1) {
-            burnOutTurnsLeft = 1;
-        } else {
-            burnOutTurnsLeft = amount;
-        }
-    }
+    
 
 }

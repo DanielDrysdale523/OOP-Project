@@ -303,7 +303,11 @@ public class Typist2 extends Typist
         burnoutRecoveryTime = tempBurnoutAmount;
         burnoutRisk = (tempBurnoutTimes1000/10000.0); 
     }
-
+    /**
+     * Sets the Slide back amount of the typist.
+     *
+     * @param amount; the slide back amout
+     */
     public void setSlideBackAmount(int amount){
         if (amount <= 1) {
             slideBackAmount = 1;
@@ -311,6 +315,11 @@ public class Typist2 extends Typist
             slideBackAmount = amount;
         }
     }
+    /**
+     * Sets the Burnout recovery time amount of the typist.
+     *
+     * @param amount; the slide back amout
+     */
     public void setBurnoutRecoveryTime(int amount){
         if (amount <= 1) {
             burnoutRecoveryTime = 1;

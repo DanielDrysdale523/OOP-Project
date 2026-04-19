@@ -5,10 +5,8 @@ import java.util.concurrent.TimeUnit;
  * A typing race simulation. Three typists race to complete a passage of text,
  * advancing character by character — or sliding backwards when they mistype.
  *
- * Originally written by Ty Posaurus, who left this project to "focus on his
- * two-finger technique". He assured us the code was "basically done".
- * We have found evidence to the contrary.
- *
+ * This version  can run individual turns and compute universal modifiers and manage up to six typists.
+ * 
  * @author Daniel Drysdale
  * @version 1.0 
  */
@@ -392,17 +390,32 @@ public class TypingRace2
             i = i + 1;
         }
     }
-
+    /**
+     * Sets the length of the race
+     * @param length the new raace length
+     */
     public void setRaceLength(int length){
         passageLength = length;
     }
+     /**
+     * Returns the length of the race.
+     *
+     * @return the race length as an integer
+     */
     public int getRaceLength(){
         return passageLength;
 
     }
+    /**
+     * Constructor for objects of class TypingRace2.
+     * Doesnt do anything - here because I get errors if I dont use it
+     */
     public TypingRace2() {
     }
     
+    /* Main method for class TypingRace2.
+    * Sets up three typists, then makes them run a race.
+    */ 
     public void main(String a1[]) {
         Typist2 a = new Typist2('7', "75%", 0.75);
         Typist2 b = new Typist2('5', "50%", 0.5);

@@ -591,7 +591,6 @@ class TypingRacer implements Runnable {
         this.globalModifier = globalModifier;
         this.passage = inputPassage;
         this.outputLabel = outputLabel;
-        System.out.println("Typing Racer Initialized with " + typistCount + " typists and passage length of " + passage.length() + " characters.");
 
     }
     
@@ -648,8 +647,7 @@ class TypingRacer implements Runnable {
             updateGui.start();
 
         }
-        System.out.println("Race Finished!");
-         try {
+        try {
                 TimeUnit.MILLISECONDS.sleep(2000);
             } catch (Exception e) {}
         Thread FinalGUI = new Thread(new finalGUI(outputLabel, race, frame));
@@ -749,7 +747,9 @@ class finalGUI implements Runnable {
             competitors[i].updateStats();
             Double beforeAccuracy = competitors[i].getAccuracy();
 
-            Double accuracyModifierFromBurnout = (( afterAccuracy * 100.0) - (beforeAccuracy * 100.0))/100.0;
+            Double accuracyModifierFromBurnoutd = (( afterAccuracy * 100.0) - (beforeAccuracy * 100.0))/100.0;
+            accuracyModifierFromBurnoutd = Math.round(accuracyModifierFromBurnoutd * 100.0) / 100.0;
+            final Double accuracyModifierFromBurnout = accuracyModifierFromBurnoutd;
             competitors[i].setAccuracy(afterAccuracy);
 
 
@@ -836,24 +836,24 @@ class finalGUI implements Runnable {
 
 
             if (competitors[i].top3GamesInRowCounter >=9) {
-                competeTitle = "Supersonic";
+                competeTitle = "Supersonic ";
                 
             }
             else if (competitors[i].top3GamesInRowCounter >=6){
-                competeTitle = "Zooming";
+                competeTitle = "Zooming ";
             }else if (competitors[i].top3GamesInRowCounter >=3){
-                competeTitle = "Speedy";
+                competeTitle = "Speedy ";
 
             }
 
             if (competitors[i].z90PercentAccuracyCounter >=9) {
-                competeTitle += "Impeccable";
+                competeTitle += "Impeccable ";
                 
             }
             else if (competitors[i].z90PercentAccuracyCounter >=6){
-                competeTitle += "Pinpoint";
+                competeTitle += "Pinpoint ";
             }else if (competitors[i].z90PercentAccuracyCounter >=3){
-                competeTitle += "Accurate";
+                competeTitle += "Accurate ";
 
             }if (competitors[i].noBurnoutCounter >=5) {
                 competeTitle += " Steel Fingered";
@@ -865,8 +865,12 @@ class finalGUI implements Runnable {
                 competeTitle += " Copper Fingered";
 
             }
-            if(competeTitle.equals("")){
-                competitors[i].title = (competeTitle + " Typist ");
+           if(!competeTitle.isEmpty()){
+                competitors[i].title = competeTitle + " Typist";
+            }
+            else if(competitors[i].title.equals(" Typist")){
+                competitors[i].title = competeTitle + " Typist";
+   
             }
 
             
@@ -1127,7 +1131,6 @@ class finalGUI implements Runnable {
                     competitors[i].resetToStart();
                 }
 
-                System.out.println("Play Again Clicked!");
 
                 midRaceGui midRace = new midRaceGui();
                 midRace.midRaceGuiSetup(frame, competitors, competitors.length, (String) globalmodifiersSelection.getSelectedItem(), (String) passageLengthSecelction.getSelectedItem());
@@ -1184,7 +1187,9 @@ class finalGUI implements Runnable {
         nextButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                changeCount(count + 1);
+                if(count < typist.history.length - 1){
+                    changeCount(count + 1);
+                }
 
                 String  historyString2 = "<HTML><b>History of " + typist.getName() + ":</b><br>" + "Race " + (count + 1) + ": " + "LPM: " + typist.history[count].LPM + ", Accuracy: " + typist.history[count].accuracy + ", Slide Backs: " + typist.history[count].slideBacks + ", Burnouts: " + typist.history[count].burnouts + ", Position: " + typist.history[count].positionFinished + "<br></HTML>";
                 historyLabel.setText(historyString2);
@@ -1195,7 +1200,9 @@ class finalGUI implements Runnable {
         prevButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent evt) {
-                changeCount(count - 1);
+                if(count > 0){
+                    changeCount(count - 1);
+                }
                 //So now, I get the data from the typist, and display it in a nice way on the window.
                 String  historyString2 = "<HTML><b>History of " + typist.getName() + ":</b><br>" + "Race " + (count + 1) + ": " + "LPM: " + typist.history[count].LPM + ", Accuracy: " + typist.history[count].accuracy + ", Slide Backs: " + typist.history[count].slideBacks + ", Burnouts: " + typist.history[count].burnouts + ", Position: " + typist.history[count].positionFinished + "<br></HTML>";
                 historyLabel.setText(historyString2);
@@ -1316,7 +1323,6 @@ class midRaceGui{
         f.setVisible(true);
         
 
-        System.out.println("Rendered Race GUI with passage: " + passage);
 
         
 
@@ -1348,6 +1354,9 @@ class raceGUI{
         
 
 
+    }
+    public void startRaceGUI(){
+        setupGUI x = new setupGUI();
     }
     
 
